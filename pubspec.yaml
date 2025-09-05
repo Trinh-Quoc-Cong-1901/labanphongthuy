@@ -1,0 +1,71 @@
+name: la_ban_phong_thuy
+description: "La bàn phong thủy - Compass app với tính năng phong thủy cá nhân."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Core GetX framework
+  get: ^4.7.2
+  
+  # Compass and sensors
+  flutter_compass: ^0.8.1
+  sensors_plus: ^6.1.1
+  
+  # Screenshot and sharing
+  screenshot: ^3.0.0
+  gal: ^2.3.0
+  share_plus: ^11.0.0
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.0+1
+  
+  # Data and state management
+  rxdart: ^0.28.0
+  equatable: ^2.0.7
+  
+  # UI and responsive
+  flutter_screenutil: ^5.9.3
+  cupertino_icons: ^1.0.8
+  
+  # Utils
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/compass/
+    - assets/compass/2x/
+    - assets/compass/3x/
+    - assets/fonts/
+  
+  fonts:
+    - family: SVN-Gilroy
+      fonts:
+        - asset: assets/fonts/SVN-Gilroy-Regular.ttf
+        - asset: assets/fonts/SVN-Gilroy-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/SVN-Gilroy-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/SVN-Gilroy-Light.ttf
+          weight: 300
