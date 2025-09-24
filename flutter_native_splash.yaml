@@ -1,0 +1,9 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+  color: "#0A1628"                    # Brand color matching app background
+  image: assets/icon/logo_app.png
+  android_12:
+    color: "#0A1628"
+    image: assets/icon/logo_app.png

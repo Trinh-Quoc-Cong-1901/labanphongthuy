@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'features/splash/views/splash_view.dart';
+import 'features/splash/bindings/splash_binding.dart';
+import 'features/onboarding/views/onboarding_view.dart';
+import 'features/onboarding/bindings/onboarding_binding.dart';
 import 'features/compass/views/compass_selection_view.dart';
 import 'features/compass/views/basic_compass_view.dart';
 import 'features/compass/views/personal_compass_view.dart';
@@ -53,6 +57,16 @@ class LabanPhongThuyApp extends StatelessWidget {
           // Routes
           getPages: [
             GetPage(
+              name: '/splash',
+              page: () => const SplashView(),
+              binding: SplashBinding(),
+            ),
+            GetPage(
+              name: '/onboarding',
+              page: () => const OnboardingView(),
+              binding: OnboardingBinding(),
+            ),
+            GetPage(
               name: '/',
               page: () => CompassSelectionView(),
               binding: CompassBinding(),
@@ -78,7 +92,7 @@ class LabanPhongThuyApp extends StatelessWidget {
               binding: CompassBinding(),
             ),
           ],
-          initialRoute: '/',
+          initialRoute: '/splash',
         );
       },
     );

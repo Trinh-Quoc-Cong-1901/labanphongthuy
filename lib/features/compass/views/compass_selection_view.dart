@@ -20,18 +20,18 @@ class CompassSelectionView extends StatelessWidget {
     );
   }
 
-  /// Build app bar with back button and title
+  /// Build app bar with title only
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: CompassUITheme.backgroundColor,
       elevation: 0,
-      leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: CompassUITheme.primaryTextColor,
-        ),
-        onPressed: () => Get.back(),
-      ),
+      automaticallyImplyLeading: false, // This removes the back button
+
+
+
+
+
+
       title: Text(
         'La bàn phong thủy',
         style: CompassUITheme.appBarTitleStyle,

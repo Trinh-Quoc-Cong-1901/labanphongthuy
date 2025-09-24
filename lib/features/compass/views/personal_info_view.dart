@@ -58,13 +58,15 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(CompassUITheme.screenPadding),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(CompassUITheme.screenPadding),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 SizedBox(height: 26.ch),
                 
                 // Description
@@ -438,7 +440,8 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                 
                 // Bottom spacer
                 SizedBox(height: 32.ch),
-              ],
+                ],
+              ),
             ),
           ),
         ),
