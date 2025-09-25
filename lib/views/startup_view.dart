@@ -25,15 +25,11 @@ class _StartupViewState extends State<StartupView> {
       final isOnboardingCompleted = await OnboardingService.isOnboardingCompleted();
 
       if (mounted) {
-        // For debugging - force go to compass
-        Get.offAllNamed('/compass');
-
-        // Original logic:
-        // if (isOnboardingCompleted) {
-        //   Get.offAllNamed('/compass');
-        // } else {
-        //   Get.offAllNamed('/onboarding');
-        // }
+        if (isOnboardingCompleted) {
+          Get.offAllNamed('/compass');
+        } else {
+          Get.offAllNamed('/onboarding');
+        }
       }
     } catch (e) {
       // In case of error, force go to compass for debugging
