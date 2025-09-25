@@ -55,7 +55,7 @@ class OnboardingController extends GetxController {
   void completeOnboarding() async {
     // Save onboarding completed status to SharedPreferences
     await OnboardingService.setOnboardingCompleted();
-    Get.offAllNamed('/');
+    Get.offAllNamed('/compass');
   }
 
   // Update current page index
