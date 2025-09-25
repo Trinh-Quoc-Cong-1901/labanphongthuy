@@ -780,7 +780,7 @@ class CompassController extends GetxController {
         }
       }
       
-      final String message = '$compassType: $heading° - Hướng: $fullDirectionText$personalText\nTừ ứng dụng Lịch Âm';
+      final String message = '$compassType: $heading° - Hướng: $fullDirectionText$personalText\nTừ ứng dụng La bàn Phong thuỷ';
       
       await Share.shareXFiles(
         [XFile(imageFile.path)],
