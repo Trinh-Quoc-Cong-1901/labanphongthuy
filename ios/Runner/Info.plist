@@ -34,6 +34,8 @@
 		<string>Ứng dụng cần quyền thêm ảnh vào thư viện để lưu ảnh chụp màn hình la bàn</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Ứng dụng cần quyền truy cập thư viện ảnh để lưu ảnh chụp màn hình la bàn</string>
+		<key>NSUserNotificationsUsageDescription</key>
+		<string>Ứng dụng cần quyền gửi thông báo để nhắc nhở bạn sử dụng la bàn phong thủy hàng ngày</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UILaunchStoryboardName</key>

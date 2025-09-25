@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../utils/compass_responsive.dart';
 import '../../../config/assets_path.dart';
+import '../../../controllers/notification_controller.dart';
 
 import '../constants/compass_ui_theme.dart';
 import 'basic_compass_view.dart';
@@ -13,6 +14,9 @@ class CompassSelectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize notification controller
+    Get.put(NotificationController());
+
     return Scaffold(
       backgroundColor: CompassUITheme.backgroundColor,
       appBar: _buildAppBar(),
@@ -37,6 +41,26 @@ class CompassSelectionView extends StatelessWidget {
         style: CompassUITheme.appBarTitleStyle,
       ),
       centerTitle: true,
+      actions: [
+        // Notification settings button
+        Container(
+          margin: const EdgeInsets.only(right: 8),
+          child: Builder(
+            builder: (context) {
+              final notificationController = Get.find<NotificationController>();
+              return Obx(() => IconButton(
+                icon: Icon(
+                  notificationController.notificationsEnabled.value
+                      ? Icons.notifications_active
+                      : Icons.notifications_off,
+                  color: const Color(0xFFFDC24C),
+                ),
+                onPressed: () => _showNotificationSettings(context, notificationController),
+              ));
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -68,7 +92,11 @@ class CompassSelectionView extends StatelessWidget {
                 child: _buildCompassCard(
                   title: 'La bàn cơ bản',
                   imagePath: CompassPath.baseCompass,
-                  onTap: () => Get.to(() => const BasicCompassView()),
+                  onTap: () {
+                    final notificationController = Get.find<NotificationController>();
+                    notificationController.trackCompassUsage();
+                    Get.to(() => const BasicCompassView());
+                  },
                 ),
               ),
               
@@ -79,7 +107,11 @@ class CompassSelectionView extends StatelessWidget {
                 child: _buildCompassCard(
                   title: 'La bàn theo tuổi',
                   imagePath: CompassPath.personalCompassKua1,
-                  onTap: () => Get.to(() => const PersonalInfoView()),
+                  onTap: () {
+                    final notificationController = Get.find<NotificationController>();
+                    notificationController.trackCompassUsage();
+                    Get.to(() => const PersonalInfoView());
+                  },
                 ),
               ),
             ],
@@ -175,6 +207,69 @@ class CompassSelectionView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// Show notification settings dialog
+  void _showNotificationSettings(BuildContext context, NotificationController controller) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: CompassUITheme.cardBackground,
+          title: Text(
+            'CÀI ĐẶT THÔNG BÁO',
+            textAlign: TextAlign.center,
+            style: CompassUITheme.appBarTitleStyle.copyWith(
+              fontSize: 18,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Toggle notifications
+              Obx(() => SwitchListTile(
+                title: Text(
+                  'Bật thông báo phong thủy',
+                  style: CompassUITheme.descriptionTextStyle,
+                ),
+                subtitle: Text(
+                  'Nhận lời khuyên và nhắc nhở hàng ngày',
+                  style: CompassUITheme.descriptionTextStyle.copyWith(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                value: controller.notificationsEnabled.value,
+                onChanged: (value) => controller.toggleNotifications(value),
+                activeThumbColor: const Color(0xFFFDC24C),
+                contentPadding: const EdgeInsets.only(right: 1, left: 4),
+              )),
+
+              const SizedBox(height: 12),
+
+
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'Đóng',
+                style: const TextStyle(
+                  color: Color(0xFFFDC24C),
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

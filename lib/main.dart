@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'views/startup_view.dart';
+import 'services/notification_service.dart';
+import 'controllers/notification_controller.dart';
 import 'features/compass/views/compass_selection_view.dart';
 import 'features/onboarding/views/onboarding_view.dart';
 import 'features/onboarding/bindings/onboarding_binding.dart';
@@ -15,14 +17,26 @@ import 'features/compass/bindings/compass_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Set orientation to portrait
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
+  // Initialize dependency injection
+  _initDependencies();
+
   runApp(const LabanPhongThuyApp());
+}
+
+// Initialize dependencies with lich-am style architecture
+void _initDependencies() {
+  // Permanent services
+  Get.put<NotificationService>(NotificationService(), permanent: true);
+
+  // Lazy controllers
+  Get.lazyPut<NotificationController>(() => NotificationController(), fenix: true);
 }
 
 class LabanPhongThuyApp extends StatelessWidget {

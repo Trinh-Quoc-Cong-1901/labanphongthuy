@@ -36,6 +36,10 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.2.2
 
+  # Notifications - using working version from lich-am app
+  flutter_local_notifications: ^19.1.0
+  timezone: ^0.10.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

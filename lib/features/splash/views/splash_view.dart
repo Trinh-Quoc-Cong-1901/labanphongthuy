@@ -8,7 +8,7 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize SplashController when splash view is created
-    Get.find<SplashController>();
+    Get.put(SplashController());
     return Scaffold(
       backgroundColor: const Color(0xFF0A1628), // Match app background
       body: Center(
