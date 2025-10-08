@@ -412,7 +412,7 @@ class PersonalCompassDetailView extends StatelessWidget {
       if (direction.type == FengShuiDirectionType.sinhKhi) {
         return 'hướng tốt nhất trong 4 hướng cát';
       } else if (direction.type == FengShuiDirectionType.dienNien) {
-        return 'một trong 4 hướng tốt (còn gọi là Diên Niên)';
+        return '(còn gọi là Diên Niên) - một trong 4 hướng tốt';
       } else {
         return 'một trong 4 hướng tốt';
       }
