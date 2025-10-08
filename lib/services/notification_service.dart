@@ -228,9 +228,6 @@ class NotificationService extends GetxService {
     // Schedule morning notification (7:30)
     await _scheduleMorningNotification(kuaNumber);
 
-    // Schedule evening notification (19:00)
-    await _scheduleEveningNotification();
-
     // Schedule weekly notification (Sunday 10:00)
     await _scheduleWeeklyNotification();
 
@@ -253,21 +250,6 @@ class NotificationService extends GetxService {
       hour: 7,
       minute: 30,
       payload: 'morning_compass',
-    );
-  }
-
-  // Schedule evening notification
-  Future<void> _scheduleEveningNotification() async {
-    final title = "🌙 Phong thủy buổi tối";
-    final body = _getEveningTip();
-
-    await _scheduleRepeatingNotification(
-      id: 2,
-      title: title,
-      body: body,
-      hour: 19,
-      minute: 0,
-      payload: 'evening_tips',
     );
   }
 
@@ -488,22 +470,6 @@ class NotificationService extends GetxService {
     };
 
     return messages[kuaNumber] ?? "Hãy kiểm tra hướng tốt cho ngày hôm nay! 🧭";
-  }
-
-  // Get evening feng shui tip
-  String _getEveningTip() {
-    final tips = [
-      "💡 Đặt gương sao cho không phản chiếu giường ngủ",
-      "🌱 Cây xanh ở góc Đông Nam thu hút tài lộc",
-      "💡 Ánh sáng mềm mại giúp tăng năng lượng tích cực",
-      "✨ Dọn dẹp nhà cửa để năng lượng lưu thông tốt hơn",
-      "🎨 Màu sắc phù hợp với Kua giúp tăng vận may",
-      "🚪 Cửa chính không nên thẳng hàng với cửa sau",
-      "🛏️ Đầu giường nên tựa vào tường vững chắc",
-    ];
-
-    final random = Random();
-    return tips[random.nextInt(tips.length)];
   }
 
   // Get weekly feng shui wisdom
