@@ -31,11 +31,6 @@ class CompassSelectionView extends StatelessWidget {
       elevation: 0,
       automaticallyImplyLeading: false, // This removes the back button
 
-
-
-
-
-
       title: Text(
         'La bàn phong thủy',
         style: CompassUITheme.appBarTitleStyle,
@@ -49,14 +44,15 @@ class CompassSelectionView extends StatelessWidget {
             builder: (context) {
               final notificationController = Get.find<NotificationController>();
               return Obx(() => IconButton(
-                icon: Icon(
-                  notificationController.notificationsEnabled.value
-                      ? Icons.notifications_active
-                      : Icons.notifications_off,
-                  color: const Color(0xFFFDC24C),
-                ),
-                onPressed: () => _showNotificationSettings(context, notificationController),
-              ));
+                    icon: Icon(
+                      notificationController.notificationsEnabled.value
+                          ? Icons.notifications_active
+                          : Icons.notifications_off,
+                      color: const Color(0xFFFDC24C),
+                    ),
+                    onPressed: () => _showNotificationSettings(
+                        context, notificationController),
+                  ));
             },
           ),
         ),
@@ -72,18 +68,19 @@ class CompassSelectionView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: CompassUITheme.titleDescriptionSpacing),
-          
+
           // Description text
           Text(
             'Hãy chọn la bàn phù hợp với công việc hoặc mục đích sử dụng của bạn',
             style: CompassUITheme.descriptionTextStyle.copyWith(
-              height: 26.ch / CompassUITheme.descriptionTextSize, // Line height 26px
+              height: 26.ch /
+                  CompassUITheme.descriptionTextSize, // Line height 26px
             ),
             textAlign: TextAlign.center,
           ),
-          
+
           SizedBox(height: CompassUITheme.descriptionCardsSpacing),
-          
+
           // Compass selection cards
           Row(
             children: [
@@ -93,22 +90,24 @@ class CompassSelectionView extends StatelessWidget {
                   title: 'La bàn cơ bản',
                   imagePath: CompassPath.baseCompass,
                   onTap: () {
-                    final notificationController = Get.find<NotificationController>();
+                    final notificationController =
+                        Get.find<NotificationController>();
                     notificationController.trackCompassUsage();
                     Get.to(() => const BasicCompassView());
                   },
                 ),
               ),
-              
+
               SizedBox(width: CompassUITheme.cardSpacing),
-              
+
               // Personal compass card
               Expanded(
                 child: _buildCompassCard(
                   title: 'La bàn theo tuổi',
                   imagePath: CompassPath.personalCompassKua1,
                   onTap: () {
-                    final notificationController = Get.find<NotificationController>();
+                    final notificationController =
+                        Get.find<NotificationController>();
                     notificationController.trackCompassUsage();
                     Get.to(() => const PersonalInfoView());
                   },
@@ -142,7 +141,8 @@ class CompassSelectionView extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: CompassUITheme.cardBackground,
-            borderRadius: BorderRadius.circular(CompassUITheme.cardBorderRadius),
+            borderRadius:
+                BorderRadius.circular(CompassUITheme.cardBorderRadius),
           ),
           padding: EdgeInsets.symmetric(
             vertical: CompassUITheme.cardVerticalPadding,
@@ -194,9 +194,9 @@ class CompassSelectionView extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(height: CompassUITheme.cardImageTextSpacing),
-              
+
               // Card label
               Text(
                 title,
@@ -211,7 +211,8 @@ class CompassSelectionView extends StatelessWidget {
   }
 
   /// Show notification settings dialog
-  void _showNotificationSettings(BuildContext context, NotificationController controller) {
+  void _showNotificationSettings(
+      BuildContext context, NotificationController controller) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -229,26 +230,24 @@ class CompassSelectionView extends StatelessWidget {
             children: [
               // Toggle notifications
               Obx(() => SwitchListTile(
-                title: Text(
-                  'Bật thông báo phong thủy',
-                  style: CompassUITheme.descriptionTextStyle,
-                ),
-                subtitle: Text(
-                  'Nhận lời khuyên và nhắc nhở hàng ngày',
-                  style: CompassUITheme.descriptionTextStyle.copyWith(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                value: controller.notificationsEnabled.value,
-                onChanged: (value) => controller.toggleNotifications(value),
-                activeThumbColor: const Color(0xFFFDC24C),
-                contentPadding: const EdgeInsets.only(right: 1, left: 4),
-              )),
+                    title: Text(
+                      'Bật thông báo phong thủy',
+                      style: CompassUITheme.descriptionTextStyle,
+                    ),
+                    subtitle: Text(
+                      'Nhận lời khuyên và nhắc nhở hàng ngày',
+                      style: CompassUITheme.descriptionTextStyle.copyWith(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    value: controller.notificationsEnabled.value,
+                    onChanged: (value) => controller.toggleNotifications(value),
+                    // activeThumbColor: const Color(0xFFFDC24C),
+                    contentPadding: const EdgeInsets.only(right: 1, left: 4),
+                  )),
 
               const SizedBox(height: 12),
-
-
             ],
           ),
           actions: [
