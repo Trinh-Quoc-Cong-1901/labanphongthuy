@@ -7,6 +7,8 @@ import '../../../controllers/notification_controller.dart';
 import '../constants/compass_ui_theme.dart';
 import 'basic_compass_view.dart';
 import 'personal_info_view.dart';
+import '../../chat/views/chat_view.dart';
+import '../../chat/bindings/chat_binding.dart';
 
 /// Compass Selection Screen - choose between basic and personal compass
 class CompassSelectionView extends StatelessWidget {
@@ -21,6 +23,8 @@ class CompassSelectionView extends StatelessWidget {
       backgroundColor: CompassUITheme.backgroundColor,
       appBar: _buildAppBar(),
       body: _buildBody(),
+      floatingActionButton: _buildChatButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -269,6 +273,56 @@ class CompassSelectionView extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  /// Build chat floating action button
+  Widget _buildChatButton() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFDC24C), Color(0xFFE0A800)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFFDC24C).withValues(alpha: 0.4),
+            blurRadius: 12,
+            spreadRadius: 3,
+            offset: const Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        onPressed: () => _openChat(),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: const Icon(
+          Icons.smart_toy,
+          color: Color(0xFF2C3E50),
+          size: 28,
+        ),
+      ),
+    );
+  }
+
+  /// Open chat with Phong Vân
+  void _openChat() {
+    Get.to(
+      () => const ChatView(),
+      binding: ChatBinding(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 300),
     );
   }
 }
