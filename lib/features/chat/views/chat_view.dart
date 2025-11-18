@@ -496,7 +496,7 @@ class ChatView extends StatelessWidget {
                 controller: controller.messageController,
                 focusNode: controller.messageFocusNode,
                 decoration: InputDecoration(
-                  hintText: 'Hỏi Phong Vân về tử vi, phong thủy...',
+                  hintText: 'Hỏi Phong Vân về phong thủy...',
                   hintStyle: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
