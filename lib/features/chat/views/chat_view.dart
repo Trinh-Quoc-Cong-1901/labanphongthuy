@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_controller.dart';
 import '../models/chat_message.dart';
@@ -60,7 +61,7 @@ class ChatView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Lão Đại AI',
+                  'Phong Vân',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -68,7 +69,7 @@ class ChatView extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Chuyên gia tử vi, phong thủy và đông y',
+                  'Chuyên gia phong thủy',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white70,
@@ -274,7 +275,6 @@ class ChatView extends StatelessWidget {
           )),
         ),
         _buildSuggestedQuestions(controller),
-        _buildLoadingIndicator(controller),
         _buildMessageInput(controller),
       ],
     );
@@ -368,16 +368,7 @@ class ChatView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    message.content,
-                    style: message.isFromUser
-                        ? ChatUITheme.userMessageTextStyle
-                        : TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF333333),
-                            height: 1.4,
-                          ),
-                  ),
+                  _buildMessageContent(message),
                   const SizedBox(height: 4),
                   Text(
                     _formatTime(message.timestamp),
@@ -398,6 +389,53 @@ class ChatView extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildMessageContent(ChatMessage message) {
+    final assistantTextStyle = const TextStyle(
+      fontSize: 16,
+      color: Color(0xFF333333),
+      height: 1.4,
+    );
+
+    if (message.isFromUser) {
+      return Text(
+        message.content,
+        style: ChatUITheme.userMessageTextStyle,
+      );
+    }
+
+    if (message.isLoading) {
+      return Row(
+        children: [
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDC24C)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Phong Vân đang suy nghĩ...',
+            style: assistantTextStyle,
+          ),
+        ],
+      );
+    }
+
+    return MarkdownBody(
+      data: message.content.trim().isEmpty ? ' ' : message.content,
+      styleSheet: MarkdownStyleSheet(
+        p: assistantTextStyle,
+        listBullet: assistantTextStyle,
+        listIndent: 18,
+        listBulletPadding: const EdgeInsets.only(right: 6),
+        blockSpacing: 4,
+      ),
+      softLineBreak: true,
     );
   }
 
@@ -433,62 +471,6 @@ class ChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingIndicator(ChatController controller) {
-    return Obx(() {
-      // Check for loading message instead of just isLoading
-      final hasLoadingMessage = controller.messages.any((msg) => msg.isLoading);
-      if (!hasLoadingMessage && !controller.isLoading.value) {
-        return const SizedBox.shrink();
-      }
-
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            _buildAvatarAI(),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDC24C)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Lão Đại AI đang suy nghĩ...',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF333333),
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
   Widget _buildMessageInput(ChatController controller) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -514,7 +496,7 @@ class ChatView extends StatelessWidget {
                 controller: controller.messageController,
                 focusNode: controller.messageFocusNode,
                 decoration: InputDecoration(
-                  hintText: 'Hỏi Lão Đại AI về tử vi, phong thủy...',
+                  hintText: 'Hỏi Phong Vân về tử vi, phong thủy...',
                   hintStyle: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
