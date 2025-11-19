@@ -65,6 +65,7 @@ class ChatController extends GetxController {
       _loadAvailableModels();
       _loadSuggestedQuestions();
       await _loadConversationHistory();
+      _showInitialGreetingIfNeeded();
     } catch (e) {
       LoggerUtils.debug('ChatService not ready yet, retrying...');
       // Retry after a short delay
@@ -166,6 +167,20 @@ class ChatController extends GetxController {
         // Take up to 4 filtered questions
         suggestedQuestions.assignAll(filteredQuestions.take(4).toList());
       }
+    }
+  }
+
+  void _showInitialGreetingIfNeeded() {
+    if (messages.isEmpty && !hasInitialMessage.value) {
+      final welcomeMessage = ChatMessage(
+        id: _uuid.v4(),
+        content:
+            'Chào bạn! Tôi là Phong Vân – chuyên gia phong thủy. Bạn muốn hỏi gì từ AI hôm nay?',
+        role: MessageRole.assistant,
+        timestamp: DateTime.now(),
+      );
+      messages.add(welcomeMessage);
+      hasInitialMessage.value = true;
     }
   }
 
@@ -434,6 +449,7 @@ class ChatController extends GetxController {
     messages.clear();
     hasInitialMessage.value = false;
     _loadSuggestedQuestions();
+    _showInitialGreetingIfNeeded();
   }
 
   // Delete current conversation
