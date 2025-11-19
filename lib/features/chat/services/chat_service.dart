@@ -124,15 +124,14 @@ class ChatService extends GetxService {
     await _databaseProvider.openBox<String>(_suggestedQuestionsBoxName);
 
     // Check version and update suggested questions if needed
-    final storedVersion =
-        _databaseProvider.getValue<int>(
+    final storedVersion = _databaseProvider.getValue<int>(
           _suggestedQuestionsBoxName,
           'version',
         ) ??
         0;
     final hasQuestions =
         _databaseProvider.getValue(_suggestedQuestionsBoxName, 'questions') !=
-        null;
+            null;
 
     if (!hasQuestions || storedVersion < _suggestedQuestionsVersion) {
       await _initializeSuggestedQuestions();
@@ -473,8 +472,7 @@ class ChatService extends GetxService {
       }
     }
 
-    final errorMessage =
-        response.data?['message'] ??
+    final errorMessage = response.data?['message'] ??
         'Unknown error while creating chat participant';
     LoggerUtils.error('ChatService: Failed to create chat user: $errorMessage');
     throw Exception('Failed to create chat user: $errorMessage');

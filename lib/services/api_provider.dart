@@ -120,12 +120,15 @@ class ApiProvider {
       final cacheKey = _getCacheKey(requestOptions);
 
       // Cache the response
-      _cacheManager.cacheData(cacheKey, {
-        'data': response.data,
-        'headers': response.headers.map,
-        'statusCode': response.statusCode,
-        'statusMessage': response.statusMessage,
-      }, expirationHours: _defaultCacheExpiration);
+      _cacheManager.cacheData(
+          cacheKey,
+          {
+            'data': response.data,
+            'headers': response.headers.map,
+            'statusCode': response.statusCode,
+            'statusMessage': response.statusMessage,
+          },
+          expirationHours: _defaultCacheExpiration);
     } catch (e) {
       LoggerUtils.error('Failed to cache response', e);
     }
@@ -162,12 +165,11 @@ class ApiProvider {
 
   // Generate a cache key for a request
   String _getCacheKey(RequestOptions requestOptions) {
-    final params =
-        requestOptions.queryParameters.isNotEmpty
-            ? requestOptions.queryParameters.entries
-                .map((e) => '${e.key}=${e.value}')
-                .join('&')
-            : '';
+    final params = requestOptions.queryParameters.isNotEmpty
+        ? requestOptions.queryParameters.entries
+            .map((e) => '${e.key}=${e.value}')
+            .join('&')
+        : '';
     return '${requestOptions.method}:${requestOptions.path}${params.isNotEmpty ? "?$params" : ""}';
   }
 
@@ -490,37 +492,37 @@ class ApiProvider {
 // Custom exceptions
 class AppException extends DioException {
   AppException(RequestOptions requestOptions, {super.response})
-    : super(requestOptions: requestOptions);
+      : super(requestOptions: requestOptions);
 }
 
 class BadRequestException extends AppException {
   BadRequestException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class UnauthorizedException extends AppException {
   UnauthorizedException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class ForbiddenException extends AppException {
   ForbiddenException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class NotFoundException extends AppException {
   NotFoundException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class ConflictException extends AppException {
   ConflictException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class InternalServerErrorException extends AppException {
   InternalServerErrorException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class NoInternetConnectionException extends AppException {
@@ -541,7 +543,7 @@ class RequestCancelledException extends AppException {
 
 class ServerException extends AppException {
   ServerException(super.requestOptions, Response? response)
-    : super(response: response);
+      : super(response: response);
 }
 
 class UnexpectedException extends AppException {

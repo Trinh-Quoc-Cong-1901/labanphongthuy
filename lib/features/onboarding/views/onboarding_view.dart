@@ -16,47 +16,47 @@ class OnboardingView extends GetView<OnboardingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(() => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0A1628), // Dark blue background like thansohoc
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Top section with page indicator
-              Padding(
-                padding: EdgeInsets.only(top: 20.h),
-                child: PageIndicator(
-                  currentIndex: controller.currentIndex.value,
-                  totalPages: OnboardingController.totalPages,
-                ),
-              ),
+            decoration: const BoxDecoration(
+              color: Color(0xFF0A1628), // Dark blue background like thansohoc
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Top section with page indicator
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.h),
+                    child: PageIndicator(
+                      currentIndex: controller.currentIndex.value,
+                      totalPages: OnboardingController.totalPages,
+                    ),
+                  ),
 
-              // Page content
-              Expanded(
-                child: PageView(
-                  controller: controller.pageController,
-                  onPageChanged: controller.updatePageIndex,
-                  children: [
-                    _buildPageOne(),
-                    const OnboardingPageTwo(),
-                    const OnboardingPageThree(),
-                  ],
-                ),
-              ),
+                  // Page content
+                  Expanded(
+                    child: PageView(
+                      controller: controller.pageController,
+                      onPageChanged: controller.updatePageIndex,
+                      children: [
+                        _buildPageOne(),
+                        const OnboardingPageTwo(),
+                        const OnboardingPageThree(),
+                      ],
+                    ),
+                  ),
 
-              // Bottom section with buttons
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 24.w,
-                  right: 24.w,
-                  bottom: 6.h,
-                ),
-                child: _buildBottomSection(),
+                  // Bottom section with buttons
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: 24.w,
+                      right: 24.w,
+                      bottom: 6.h,
+                    ),
+                    child: _buildBottomSection(),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      )),
+            ),
+          )),
     );
   }
 

@@ -115,8 +115,19 @@ class LunarService {
   /// Get lunar month string representation
   static String _getMonthString(int month) {
     const months = [
-      '', 'Giêng', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu',
-      'Bảy', 'Tám', 'Chín', 'Mười', 'Mười một', 'Chạp'
+      '',
+      'Giêng',
+      'Hai',
+      'Ba',
+      'Tư',
+      'Năm',
+      'Sáu',
+      'Bảy',
+      'Tám',
+      'Chín',
+      'Mười',
+      'Mười một',
+      'Chạp'
     ];
     return month >= 1 && month <= 12 ? months[month] : 'Không rõ';
   }

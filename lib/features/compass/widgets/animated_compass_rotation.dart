@@ -52,7 +52,8 @@ class SmoothRotationTransition extends StatefulWidget {
   });
 
   @override
-  State<SmoothRotationTransition> createState() => _SmoothRotationTransitionState();
+  State<SmoothRotationTransition> createState() =>
+      _SmoothRotationTransitionState();
 }
 
 class _SmoothRotationTransitionState extends State<SmoothRotationTransition>
@@ -83,14 +84,14 @@ class _SmoothRotationTransitionState extends State<SmoothRotationTransition>
   @override
   void didUpdateWidget(SmoothRotationTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     if (oldWidget.angle != widget.angle) {
       _currentAngle = _animation.value;
       _targetAngle = widget.angle;
-      
+
       // Calculate shortest rotation path
       double diff = _targetAngle - _currentAngle;
-      
+
       // Normalize to [-π, π]
       while (diff > math.pi) {
         diff -= 2 * math.pi;
@@ -98,9 +99,9 @@ class _SmoothRotationTransitionState extends State<SmoothRotationTransition>
       while (diff < -math.pi) {
         diff += 2 * math.pi;
       }
-      
+
       _targetAngle = _currentAngle + diff;
-      
+
       _animation = Tween<double>(
         begin: _currentAngle,
         end: _targetAngle,
@@ -108,7 +109,7 @@ class _SmoothRotationTransitionState extends State<SmoothRotationTransition>
         parent: _controller,
         curve: widget.curve,
       ));
-      
+
       _controller.forward(from: 0);
     }
   }

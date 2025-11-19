@@ -16,8 +16,8 @@ import '../services/sensor_service.dart';
 import '../services/feng_shui_calculator.dart';
 
 enum CompassMode {
-  basic,     // La bàn cơ bản - 8 cung + 24 sơn
-  personal,  // La bàn cá nhân - theo tuổi + feng shui
+  basic, // La bàn cơ bản - 8 cung + 24 sơn
+  personal, // La bàn cá nhân - theo tuổi + feng shui
 }
 
 class CompassController extends GetxController {
@@ -26,10 +26,11 @@ class CompassController extends GetxController {
   // Services
   final SensorService _sensorService = SensorService.instance;
   final FengShuiCalculator _fengShuiCalculator = FengShuiCalculator.instance;
-  
+
   // Performance optimization
   DateTime _lastUpdateTime = DateTime.now();
-  static const int _updateThrottleMs = 16; // ~60 FPS, reduce from default sensor frequency
+  static const int _updateThrottleMs =
+      16; // ~60 FPS, reduce from default sensor frequency
 
   // Observable data
   final _compassData = CompassData.initial().obs;
@@ -52,33 +53,38 @@ class CompassController extends GetxController {
   Timer? _calibrationTimer; // Fix timer memory leak
 
   // Getters - return locked values when rotation is locked
-  CompassData get compassData => _isRotationLocked.value ? _lockedCompassData.value : _compassData.value;
+  CompassData get compassData =>
+      _isRotationLocked.value ? _lockedCompassData.value : _compassData.value;
   bool get isCompassAvailable => _isCompassAvailable.value;
   double get calibrationAccuracy => _calibrationAccuracy.value;
-  DirectionInfo? get currentDirection => _isRotationLocked.value ? _lockedDirection.value : _currentDirection.value;
+  DirectionInfo? get currentDirection => _isRotationLocked.value
+      ? _lockedDirection.value
+      : _currentDirection.value;
   CompassMode get compassMode => _compassMode.value;
   FengShuiResult? get fengShuiResult => _fengShuiResult.value;
   bool get isCalibrating => _isCalibrating.value;
   double get calibrationProgress => _calibrationProgress.value;
-  double get rotationAngle => _isRotationLocked.value ? _lockedAngle.value : _rotationAngle.value;
+  double get rotationAngle =>
+      _isRotationLocked.value ? _lockedAngle.value : _rotationAngle.value;
   bool get isRotating => _isRotating.value;
 
   // Personal info for feng shui
   final _birthYear = 0.obs;
   final _isMale = true.obs;
   final _hasPersonalInfo = false.obs;
-  
+
   // UI settings
   final _show24Mountains = true.obs;
-  
+
   // Zoom settings
   final _zoomLevel = 1.0.obs;
   final _isRotationLocked = false.obs;
   final _lockedAngle = 0.0.obs; // Angle when locked
-  final _lockedCompassData = CompassData.initial().obs; // Compass data when locked
+  final _lockedCompassData =
+      CompassData.initial().obs; // Compass data when locked
   final _lockedDirection = Rx<DirectionInfo?>(null); // Direction when locked
   final _zoomAction = Rx<String?>(''); // Zoom action: 'in', 'out', 'reset'
-  
+
   // Screenshot functionality
   final ScreenshotController _screenshotController = ScreenshotController();
   final _isCapturingScreenshot = false.obs;
@@ -108,7 +114,7 @@ class CompassController extends GetxController {
     _sensorService.dispose();
     super.onClose();
   }
-  
+
   /// Handle app lifecycle changes for better performance
   void onAppLifecycleStateChanged(AppLifecycleState state) {
     switch (state) {
@@ -171,12 +177,13 @@ class CompassController extends GetxController {
         if (_isRotationLocked.value) {
           return; // Don't update anything when locked
         }
-        
+
         // Throttle updates to reduce UI lag (60 FPS max)
         final now = DateTime.now();
-        if (now.difference(_lastUpdateTime).inMilliseconds >= _updateThrottleMs) {
+        if (now.difference(_lastUpdateTime).inMilliseconds >=
+            _updateThrottleMs) {
           _lastUpdateTime = now;
-          
+
           _compassData.value = data;
           _updateRotationAngle(data.heading);
           _updateCurrentDirection(data.heading);
@@ -224,11 +231,11 @@ class CompassController extends GetxController {
   /// Update rotation angle with enhanced smooth animation
   void _updateRotationAngle(double heading) {
     final newAngle = -heading; // Negative to rotate compass correctly
-    
+
     // Handle 360-0 degree transition smoothly
     final currentAngle = _rotationAngle.value;
     var diff = newAngle - currentAngle;
-    
+
     // Normalize difference to [-180, 180] range for shortest path
     while (diff > 180) {
       diff -= 360;
@@ -236,9 +243,10 @@ class CompassController extends GetxController {
     while (diff < -180) {
       diff += 360;
     }
-    
+
     // Enhanced smoothing with adaptive dampening
-    if (diff.abs() > 0.3) { // Lower threshold for smoother updates
+    if (diff.abs() > 0.3) {
+      // Lower threshold for smoother updates
       // Variable dampening based on difference magnitude
       double dampening;
       if (diff.abs() > 90) {
@@ -248,7 +256,7 @@ class CompassController extends GetxController {
       } else {
         dampening = 0.35; // Slower for small movements (smoother)
       }
-      
+
       // Apply smooth transition
       _rotationAngle.value = currentAngle + (diff * dampening);
     }
@@ -263,7 +271,7 @@ class CompassController extends GetxController {
   /// Switch between basic and personal compass modes
   void switchMode(CompassMode mode) {
     _compassMode.value = mode;
-    
+
     if (mode == CompassMode.personal && !_hasPersonalInfo.value) {
       // Need to collect personal info first
       return;
@@ -275,10 +283,10 @@ class CompassController extends GetxController {
     _birthYear.value = year;
     _isMale.value = male;
     _hasPersonalInfo.value = true;
-    
+
     // Calculate feng shui result
     _calculateFengShui();
-    
+
     // Switch to personal mode
     _compassMode.value = CompassMode.personal;
   }
@@ -308,27 +316,27 @@ class CompassController extends GetxController {
     if (_fengShuiResult.value == null || _currentDirection.value == null) {
       return null;
     }
-    
-    return _fengShuiResult.value!.getDirectionType(
-      _currentDirection.value!.baGuaDirection
-    );
+
+    return _fengShuiResult.value!
+        .getDirectionType(_currentDirection.value!.baGuaDirection);
   }
 
   /// Start compass calibration
   Future<bool> startCalibration() async {
     if (!_isCompassAvailable.value) return false;
-    
+
     _isCalibrating.value = true;
     _calibrationProgress.value = 0.0;
-    
+
     final success = await _sensorService.startCalibration();
-    
+
     if (success) {
       // Monitor calibration progress with proper cleanup
-      _calibrationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      _calibrationTimer =
+          Timer.periodic(const Duration(milliseconds: 100), (timer) {
         final progress = _sensorService.calibrationProgress;
         _calibrationProgress.value = progress;
-        
+
         if (progress >= 1.0) {
           timer.cancel();
           _calibrationTimer = null; // Clear reference
@@ -338,7 +346,7 @@ class CompassController extends GetxController {
     } else {
       _isCalibrating.value = false;
     }
-    
+
     return success;
   }
 
@@ -347,7 +355,7 @@ class CompassController extends GetxController {
     final success = _sensorService.finishCalibration();
     _isCalibrating.value = false;
     _calibrationProgress.value = 0.0;
-    
+
     if (success) {
       Get.snackbar(
         'Hiệu chỉnh thành công',
@@ -378,9 +386,10 @@ class CompassController extends GetxController {
     _sensorService.resume();
     // Compass resumed successfully
   }
-  
+
   /// Check if compass is currently active
-  bool get isActive => _compassSubscription != null && !_compassSubscription!.isPaused;
+  bool get isActive =>
+      _compassSubscription != null && !_compassSubscription!.isPaused;
 
   /// Dispose all subscriptions and timers
   void _disposeSubscriptions() {
@@ -392,17 +401,17 @@ class CompassController extends GetxController {
   }
 
   // === ZOOM FUNCTIONALITY ===
-  
+
   /// Set zoom level
   void setZoomLevel(double zoom) {
     _zoomLevel.value = zoom.clamp(1.0, 3.0);
   }
-  
+
   /// Reset zoom to default
   void resetZoom() {
     _zoomLevel.value = 1.0;
   }
-  
+
   /// Toggle rotation lock - freeze entire compass state when locked
   void toggleRotationLock() {
     if (!_isRotationLocked.value) {
@@ -417,7 +426,7 @@ class CompassController extends GetxController {
     }
     // Removed snackbar notification - icon change is enough visual feedback
   }
-  
+
   /// Trigger zoom in from button
   void triggerZoomIn() {
     _zoomAction.value = 'in';
@@ -426,7 +435,7 @@ class CompassController extends GetxController {
       _zoomAction.value = '';
     });
   }
-  
+
   /// Trigger zoom out from button
   void triggerZoomOut() {
     _zoomAction.value = 'out';
@@ -435,7 +444,7 @@ class CompassController extends GetxController {
       _zoomAction.value = '';
     });
   }
-  
+
   /// Trigger reset zoom from button
   void triggerResetZoom() {
     _zoomAction.value = 'reset';
@@ -470,71 +479,71 @@ class CompassController extends GetxController {
   void toggle24Mountains() {
     _show24Mountains.value = !_show24Mountains.value;
   }
-  
+
   /// Get current mountain (from 24 mountains)
   String getCurrentMountain() {
     if (_currentDirection.value == null) return '--';
-    
+
     final heading = _compassData.value.heading;
     final direction = _currentDirection.value!;
-    
+
     // Calculate which of the 3 mountains in this direction
     final directionRange = direction.endDegree > direction.startDegree
         ? direction.endDegree - direction.startDegree
         : (360 - direction.startDegree) + direction.endDegree;
-    
+
     final mountainSize = directionRange / 3;
-    
+
     double relativeHeading;
     if (direction.startDegree > direction.endDegree) {
       // Handle wrap around (North)
-      relativeHeading = heading >= direction.startDegree 
+      relativeHeading = heading >= direction.startDegree
           ? heading - direction.startDegree
           : (360 - direction.startDegree) + heading;
     } else {
       relativeHeading = heading - direction.startDegree;
     }
-    
+
     final mountainIndex = (relativeHeading / mountainSize).floor().clamp(0, 2);
     return direction.mountains[mountainIndex];
   }
-  
+
   // === SCREENSHOT FUNCTIONALITY ===
-  
+
   /// Take screenshot of compass with metadata
   Future<void> takeCompassScreenshot() async {
     if (_isCapturingScreenshot.value) return; // Prevent multiple captures
-    
+
     try {
       _isCapturingScreenshot.value = true;
-      
+
       // No snackbar - using isCapturingScreenshot flag for UI indicator instead
-      
+
       // Capture screenshot with optimized quality
       final Uint8List? imageBytes = await _screenshotController.capture(
         delay: const Duration(milliseconds: 10), // GPU sync
         pixelRatio: 2.0, // High quality for sharing
       );
-      
+
       if (imageBytes == null) {
         throw Exception('Failed to capture screenshot');
       }
-      
+
       // Generate filename with compass data
       final timestamp = DateTime.now();
       final heading = _compassData.value.heading.toInt();
       final direction = _currentDirection.value?.vietnameseName ?? 'Unknown';
-      final filename = 'Compass_${heading}deg_${direction}_${timestamp.millisecondsSinceEpoch}.png';
-      
+      final filename =
+          'Compass_${heading}deg_${direction}_${timestamp.millisecondsSinceEpoch}.png';
+
       // Save to temp directory first
       final Directory tempDir = await getTemporaryDirectory();
       final String tempPath = '${tempDir.path}/$filename';
       final File tempFile = File(tempPath);
       await tempFile.writeAsBytes(imageBytes);
-      
+
       // Show share dialog
       await _showScreenshotShareDialog(tempFile, heading, direction);
-      
     } catch (e) {
       // Screenshot failed
       Get.snackbar(
@@ -551,20 +560,24 @@ class CompassController extends GetxController {
       _isCapturingScreenshot.value = false;
     }
   }
-  
+
   /// Show screenshot share dialog with options
-  Future<void> _showScreenshotShareDialog(File imageFile, int heading, String direction) async {
+  Future<void> _showScreenshotShareDialog(
+      File imageFile, int heading, String direction) async {
     // Get full direction info with BaGua name
     final directionInfo = _currentDirection.value;
-    final fullDirectionText = directionInfo != null 
+    final fullDirectionText = directionInfo != null
         ? 'Hướng: ${directionInfo.vietnameseName} (${directionInfo.chineseName})'
         : 'Hướng: $direction';
-    
+
     // Get compass title and personal info
-    final compassTitle = _compassMode.value == CompassMode.personal ? 'La bàn cá nhân' : 'La bàn cơ bản';
-    
+    final compassTitle = _compassMode.value == CompassMode.personal
+        ? 'La bàn cá nhân'
+        : 'La bàn cơ bản';
+
     String personalInfo = '';
-    if (_compassMode.value == CompassMode.personal && _fengShuiResult.value != null) {
+    if (_compassMode.value == CompassMode.personal &&
+        _fengShuiResult.value != null) {
       final kua = _fengShuiResult.value!.personalInfo.kuaNumber;
       final fengShuiDirection = getCurrentFengShuiDirection();
       personalInfo = '\nQuái số: $kua';
@@ -572,7 +585,7 @@ class CompassController extends GetxController {
         personalInfo += ' - ${fengShuiDirection.name}';
       }
     }
-    
+
     Get.dialog(
       Dialog(
         backgroundColor: const Color(0xFF020931),
@@ -595,7 +608,7 @@ class CompassController extends GetxController {
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Compass info with full direction and BaGua + personal info
                 Text(
                   '$heading° - $fullDirectionText$personalInfo',
@@ -608,14 +621,15 @@ class CompassController extends GetxController {
                   maxLines: 2,
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Preview image (maintain aspect ratio, show full image)
                 Container(
                   width: 200,
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFFFCD45), width: 1),
+                    border:
+                        Border.all(color: const Color(0xFFFFCD45), width: 1),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -628,7 +642,7 @@ class CompassController extends GetxController {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Action buttons with circle button style (same as BasicCompassView)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -642,7 +656,7 @@ class CompassController extends GetxController {
                         await _saveToGallery(imageFile, heading, direction);
                       },
                     ),
-                    
+
                     // Share button
                     _buildDialogCircleButton(
                       icon: Icons.share,
@@ -652,7 +666,7 @@ class CompassController extends GetxController {
                         await _shareScreenshot(imageFile, heading, direction);
                       },
                     ),
-                    
+
                     // Close button
                     _buildDialogCircleButton(
                       icon: Icons.close,
@@ -672,7 +686,7 @@ class CompassController extends GetxController {
       ),
     );
   }
-  
+
   /// Build dialog circle button with consistent styling (same as BasicCompassView)
   Widget _buildDialogCircleButton({
     required IconData icon,
@@ -741,7 +755,7 @@ class CompassController extends GetxController {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Label
         Text(
           label,
@@ -756,22 +770,26 @@ class CompassController extends GetxController {
       ],
     );
   }
-  
+
   /// Share screenshot with system share dialog
-  Future<void> _shareScreenshot(File imageFile, int heading, String direction) async {
+  Future<void> _shareScreenshot(
+      File imageFile, int heading, String direction) async {
     try {
       // Get full direction info with BaGua name for sharing
       final directionInfo = _currentDirection.value;
-      final fullDirectionText = directionInfo != null 
+      final fullDirectionText = directionInfo != null
           ? '${directionInfo.vietnameseName} (${directionInfo.chineseName})'
           : direction;
-      
+
       // Dynamic compass type for sharing message
-      final compassType = _compassMode.value == CompassMode.personal ? 'La bàn cá nhân' : 'La bàn cơ bản';
-      
+      final compassType = _compassMode.value == CompassMode.personal
+          ? 'La bàn cá nhân'
+          : 'La bàn cơ bản';
+
       // Add personal info if available
       String personalText = '';
-      if (_compassMode.value == CompassMode.personal && _fengShuiResult.value != null) {
+      if (_compassMode.value == CompassMode.personal &&
+          _fengShuiResult.value != null) {
         final personalInfo = _fengShuiResult.value!.personalInfo;
         final fengShuiDirection = getCurrentFengShuiDirection();
         personalText = '\nQuái số: ${personalInfo.kuaNumber}';
@@ -779,18 +797,18 @@ class CompassController extends GetxController {
           personalText += ' - ${fengShuiDirection.name}';
         }
       }
-      
-      final String message = '$compassType: $heading° - Hướng: $fullDirectionText$personalText\nTừ ứng dụng La bàn Phong thuỷ';
-      
+
+      final String message =
+          '$compassType: $heading° - Hướng: $fullDirectionText$personalText\nTừ ứng dụng La bàn Phong thuỷ';
+
       await Share.shareXFiles(
         [XFile(imageFile.path)],
         text: message,
         subject: 'Ảnh $compassType - $heading° $fullDirectionText',
       );
-      
+
       // Note: Share.shareXFiles doesn't return whether sharing was successful or cancelled
       // So we don't show a success message to avoid misleading the user
-      
     } catch (e) {
       // Share failed
       Get.snackbar(
@@ -806,13 +824,14 @@ class CompassController extends GetxController {
       imageFile.delete().catchError((_) {});
     }
   }
-  
+
   /// Save screenshot to device gallery using GAL package
-  Future<void> _saveToGallery(File imageFile, int heading, String direction) async {
+  Future<void> _saveToGallery(
+      File imageFile, int heading, String direction) async {
     try {
       // Check if GAL has access permission
       final bool hasAccess = await Gal.hasAccess();
-      
+
       if (!hasAccess) {
         // Request access using GAL's built-in permission system
         final bool requestResult = await Gal.requestAccess();
@@ -829,31 +848,33 @@ class CompassController extends GetxController {
           return;
         }
       }
-      
+
       // Generate descriptive filename with compass data
       final timestamp = DateTime.now();
-      final cleanDirection = direction.replaceAll(' ', '_').replaceAll('/', '_');
-      final filename = 'Compass_${heading}deg_${cleanDirection}_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}${timestamp.day.toString().padLeft(2, '0')}_${timestamp.hour.toString().padLeft(2, '0')}${timestamp.minute.toString().padLeft(2, '0')}.png';
-      
+      final cleanDirection =
+          direction.replaceAll(' ', '_').replaceAll('/', '_');
+      final filename =
+          'Compass_${heading}deg_${cleanDirection}_${timestamp.year}${timestamp.month.toString().padLeft(2, '0')}${timestamp.day.toString().padLeft(2, '0')}_${timestamp.hour.toString().padLeft(2, '0')}${timestamp.minute.toString().padLeft(2, '0')}.png';
+
       // Create temp file with custom name for GAL
       final Directory tempDir = await getTemporaryDirectory();
       final String customPath = '${tempDir.path}/$filename';
       final File customFile = await imageFile.copy(customPath);
-      
+
       // Save to gallery using GAL package - automatically handles platform differences
       // This will save to Photos on iOS and Gallery/Pictures on Android
       await Gal.putImage(
         customFile.path,
         album: 'Compass', // Create album named "Compass"
       );
-      
+
       // Clean up custom temp file
       await customFile.delete().catchError((_) {});
-      
+
       // Success feedback with more specific message
       Get.snackbar(
         'Đã lưu ảnh thành công',
-        Platform.isAndroid 
+        Platform.isAndroid
             ? 'Ảnh đã được lưu vào Gallery > Album "Compass"'
             : 'Ảnh đã được lưu vào Photos > Album "Compass"',
         snackPosition: SnackPosition.BOTTOM,
@@ -862,14 +883,14 @@ class CompassController extends GetxController {
         icon: const Icon(Icons.check_circle, color: Colors.white),
         duration: const Duration(seconds: 4),
       );
-      
     } on GalException catch (e) {
       // Gallery save error: ${e.type}
-      
+
       String errorMessage;
       switch (e.type) {
         case GalExceptionType.accessDenied:
-          errorMessage = 'Không có quyền truy cập Photo Library. Vui lòng cấp quyền trong Settings.';
+          errorMessage =
+              'Không có quyền truy cập Photo Library. Vui lòng cấp quyền trong Settings.';
           break;
         case GalExceptionType.notEnoughSpace:
           errorMessage = 'Không đủ bộ nhớ để lưu ảnh.';
@@ -882,7 +903,7 @@ class CompassController extends GetxController {
           errorMessage = 'Lỗi không xác định khi lưu ảnh.';
           break;
       }
-      
+
       Get.snackbar(
         'Lỗi lưu ảnh',
         errorMessage,
@@ -892,7 +913,6 @@ class CompassController extends GetxController {
         icon: const Icon(Icons.error_outline, color: Colors.white),
         duration: const Duration(seconds: 5),
       );
-      
     } catch (e) {
       // Unexpected error during save
       Get.snackbar(

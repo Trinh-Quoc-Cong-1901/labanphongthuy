@@ -57,7 +57,8 @@ void _initDependencies() {
   Get.put<NotificationService>(NotificationService(), permanent: true);
 
   // Lazy controllers
-  Get.lazyPut<NotificationController>(() => NotificationController(), fenix: true);
+  Get.lazyPut<NotificationController>(() => NotificationController(),
+      fenix: true);
 }
 
 class LabanPhongThuyApp extends StatelessWidget {

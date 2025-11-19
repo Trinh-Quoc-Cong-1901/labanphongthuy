@@ -171,7 +171,8 @@ class ChatView extends StatelessWidget {
   }
 
   // Build conversation list
-  Widget _buildConversationList(List<Conversation> conversations, BuildContext context) {
+  Widget _buildConversationList(
+      List<Conversation> conversations, BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.zero,
       itemCount: conversations.length,
@@ -183,7 +184,8 @@ class ChatView extends StatelessWidget {
   }
 
   // Build conversation tile
-  Widget _buildConversationTile(Conversation conversation, BuildContext context) {
+  Widget _buildConversationTile(
+      Conversation conversation, BuildContext context) {
     return GetBuilder<ChatController>(
       builder: (controller) => GestureDetector(
         onLongPress: () {
@@ -217,7 +219,8 @@ class ChatView extends StatelessWidget {
   }
 
   // Show delete menu
-  void _showDeleteMenu(BuildContext context, Conversation conversation, ChatController controller) {
+  void _showDeleteMenu(BuildContext context, Conversation conversation,
+      ChatController controller) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -268,11 +271,12 @@ class ChatView extends StatelessWidget {
       children: [
         Expanded(
           child: Obx(() => ListView.builder(
-            controller: controller.scrollController,
-            padding: const EdgeInsets.all(16),
-            itemCount: controller.messages.length,
-            itemBuilder: (context, index) => _buildMessageBubble(controller.messages[index]),
-          )),
+                controller: controller.scrollController,
+                padding: const EdgeInsets.all(16),
+                itemCount: controller.messages.length,
+                itemBuilder: (context, index) =>
+                    _buildMessageBubble(controller.messages[index]),
+              )),
         ),
         _buildSuggestedQuestions(controller),
         _buildMessageInput(controller),
@@ -283,7 +287,8 @@ class ChatView extends StatelessWidget {
   // Build suggested questions
   Widget _buildSuggestedQuestions(ChatController controller) {
     return Obx(() {
-      if (controller.suggestedQuestions.isEmpty || controller.messages.length > 1) {
+      if (controller.suggestedQuestions.isEmpty ||
+          controller.messages.length > 1) {
         return const SizedBox.shrink();
       }
 
@@ -309,7 +314,8 @@ class ChatView extends StatelessWidget {
                 ),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () => controller.useSuggestedQuestion(question.question),
+                  onTap: () =>
+                      controller.useSuggestedQuestion(question.question),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
@@ -348,9 +354,7 @@ class ChatView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: message.isFromUser
-                    ? Color(0xFFFDC24C)
-                    : Colors.white,
+                color: message.isFromUser ? Color(0xFFFDC24C) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -520,43 +524,44 @@ class ChatView extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Obx(() => GestureDetector(
-            onTap: controller.messageText.value.trim().isEmpty || controller.isLoading.value
-                ? null
-                : controller.sendMessage,
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: controller.messageText.value.trim().isEmpty
-                    ? Colors.grey[400]
-                    : Color(0xFFFDC24C),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: controller.isLoading.value
-                  ? const Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2C3E50)),
+                onTap: controller.messageText.value.trim().isEmpty ||
+                        controller.isLoading.value
+                    ? null
+                    : controller.sendMessage,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: controller.messageText.value.trim().isEmpty
+                        ? Colors.grey[400]
+                        : Color(0xFFFDC24C),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: controller.isLoading.value
+                      ? const Center(
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF2C3E50)),
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          Icons.send,
+                          color: controller.messageText.value.trim().isEmpty
+                              ? Colors.white
+                              : Color(0xFF2C3E50),
+                          size: 20,
                         ),
-                      ),
-                    )
-                  : Icon(
-                      Icons.send,
-                      color: controller.messageText.value.trim().isEmpty
-                          ? Colors.white
-                          : Color(0xFF2C3E50),
-                      size: 20,
-                    ),
-            ),
-          )),
+                ),
+              )),
         ],
       ),
     );
   }
-
 
   String _formatTime(DateTime time) {
     final now = DateTime.now();

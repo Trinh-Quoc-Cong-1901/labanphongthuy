@@ -11,7 +11,8 @@ class NotificationController extends GetxController {
   static bool _notificationsScheduled = false;
 
   // Get notification service instance
-  NotificationService get notificationService => Get.find<NotificationService>();
+  NotificationService get notificationService =>
+      Get.find<NotificationService>();
 
   @override
   void onInit() {
@@ -61,7 +62,6 @@ class NotificationController extends GetxController {
     await notificationService.scheduleDailyNotifications();
   }
 
-
   // Add notification event
   Future<void> addNotificationEvent(NotificationEvent event) async {
     events.add(event);
@@ -85,8 +85,6 @@ class NotificationController extends GetxController {
     }
   }
 
-
-
   // Track compass usage and send achievement notifications
   Future<void> trackCompassUsage() async {
     final prefs = await SharedPreferences.getInstance();
@@ -104,7 +102,8 @@ class NotificationController extends GetxController {
 
     switch (usageCount) {
       case 1:
-        achievement = "🎉 Lần đầu sử dụng la bàn! Chào mừng bạn đến với phong thủy";
+        achievement =
+            "🎉 Lần đầu sử dụng la bàn! Chào mừng bạn đến với phong thủy";
         break;
       case 7:
         achievement = "🔥 Sử dụng la bàn 7 lần! Bạn đang làm rất tốt";
@@ -117,7 +116,9 @@ class NotificationController extends GetxController {
         break;
     }
 
-    if (achievement != null && hasPermission.value && notificationsEnabled.value) {
+    if (achievement != null &&
+        hasPermission.value &&
+        notificationsEnabled.value) {
       await notificationService.showInstantNotification(
         "🎯 Thành tích mới!",
         achievement,

@@ -9,7 +9,8 @@ import 'package:get/get.dart';
 import '../models/notification_models.dart';
 
 class NotificationService extends GetxService {
-  static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
   @override
@@ -41,14 +42,16 @@ class NotificationService extends GetxService {
   Future<void> _requestPermissions() async {
     try {
       await _notifications
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(
             alert: true,
             badge: true,
             sound: true,
           );
       await _notifications
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     } catch (e) {
       if (kDebugMode) print('🔔 Permission request error: $e');
@@ -58,8 +61,10 @@ class NotificationService extends GetxService {
   // Initialize local notifications
   Future<void> _initializeLocalNotifications() async {
     try {
-      const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-      const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+      const AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const DarwinInitializationSettings iosSettings =
+          DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true,
@@ -130,11 +135,13 @@ class NotificationService extends GetxService {
   }
 
   // Internal method to schedule event notifications
-  Future<void> _scheduleEventNotificationInternal(NotificationEvent event) async {
+  Future<void> _scheduleEventNotificationInternal(
+      NotificationEvent event) async {
     try {
       // Handle simple notification config
       if (event.simpleNotificationConfig != null) {
-        await _scheduleSimpleNotification(event, event.simpleNotificationConfig!);
+        await _scheduleSimpleNotification(
+            event, event.simpleNotificationConfig!);
       }
 
       // Handle custom reminders
@@ -149,7 +156,8 @@ class NotificationService extends GetxService {
   }
 
   // Schedule simple notification
-  Future<void> _scheduleSimpleNotification(NotificationEvent event, SimpleNotificationConfig config) async {
+  Future<void> _scheduleSimpleNotification(
+      NotificationEvent event, SimpleNotificationConfig config) async {
     if (config.notifyOnDay) {
       // Parse notification time
       final timeParts = config.notifyTime.split(':');
@@ -172,7 +180,8 @@ class NotificationService extends GetxService {
     // Schedule notifications for minutes before
     for (int minutesBefore in config.notifyMinutesBefore) {
       if (minutesBefore > 0) {
-        final scheduleTime = event.dateTime.subtract(Duration(minutes: minutesBefore));
+        final scheduleTime =
+            event.dateTime.subtract(Duration(minutes: minutesBefore));
 
         if (scheduleTime.isAfter(DateTime.now())) {
           final prefix = _getTimePrefix(minutesBefore);
@@ -189,13 +198,16 @@ class NotificationService extends GetxService {
   }
 
   // Schedule custom reminder
-  Future<void> _scheduleCustomReminder(NotificationEvent event, CustomReminderConfig config, int index) async {
+  Future<void> _scheduleCustomReminder(
+      NotificationEvent event, CustomReminderConfig config, int index) async {
     DateTime? scheduleTime;
 
     if (config.type == CustomReminderType.countdown) {
-      final totalMinutes = (config.countdownHours ?? 0) * 60 + (config.countdownMinutes ?? 0);
+      final totalMinutes =
+          (config.countdownHours ?? 0) * 60 + (config.countdownMinutes ?? 0);
       scheduleTime = event.dateTime.subtract(Duration(minutes: totalMinutes));
-    } else if (config.type == CustomReminderType.specificDate && config.specificDateTime != null) {
+    } else if (config.type == CustomReminderType.specificDate &&
+        config.specificDateTime != null) {
       scheduleTime = config.specificDateTime!;
     }
 
@@ -279,7 +291,8 @@ class NotificationService extends GetxService {
   }) async {
     try {
       final tzScheduledTime = _convertToTZDateTime(scheduledTime);
-      if (kDebugMode) print('🔔 Scheduling notification ID: $id at $tzScheduledTime');
+      if (kDebugMode)
+        print('🔔 Scheduling notification ID: $id at $tzScheduledTime');
 
       await _notifications.zonedSchedule(
         id,
@@ -416,7 +429,8 @@ class NotificationService extends GetxService {
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final location = tz.getLocation('Asia/Ho_Chi_Minh');
     final now = tz.TZDateTime.now(location);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
 
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
@@ -429,7 +443,8 @@ class NotificationService extends GetxService {
   tz.TZDateTime _nextInstanceOfWeekday(int weekday, int hour, int minute) {
     final location = tz.getLocation('Asia/Ho_Chi_Minh');
     final now = tz.TZDateTime.now(location);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(location, now.year, now.month, now.day, hour, minute);
 
     while (scheduledDate.weekday != weekday) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
@@ -488,10 +503,9 @@ class NotificationService extends GetxService {
     return wisdom[random.nextInt(wisdom.length)];
   }
 
-
-
   // Show instant notification
-  Future<void> showInstantNotification(String title, String body, {String? payload}) async {
+  Future<void> showInstantNotification(String title, String body,
+      {String? payload}) async {
     try {
       await _notifications.show(
         DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -542,14 +556,17 @@ class NotificationService extends GetxService {
   Future<bool> areNotificationsEnabled() async {
     try {
       // For Android
-      final androidPlugin = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin =
+          _notifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin != null) {
         final bool? granted = await androidPlugin.areNotificationsEnabled();
         return granted ?? false;
       }
 
       // For iOS
-      final iosPlugin = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      final iosPlugin = _notifications.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
       if (iosPlugin != null) {
         final result = await iosPlugin.checkPermissions();
         return result?.isEnabled == true;

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import '../models/feng_shui_result.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,82 +18,88 @@ class PersonalCompassView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CompassController>();
-    
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 768;
+
     return Scaffold(
-        backgroundColor: CompassUITheme.backgroundColor,
-        appBar: _buildAppBar(),
-        resizeToAvoidBottomInset: false, // Prevent resize when keyboard shows
-        body: Column(
-          children: [
-            // Main content area with SafeArea for top only
-            Expanded(
-              child: SafeArea(
-                bottom: false, // Don't apply SafeArea to bottom
-                child: Screenshot(
-                  controller: controller.screenshotController,
-                  child: Container(
-                    width: double.infinity,
-                    color: const Color(0xFF020931), // Match app background for clean screenshot
-                    child: Column(
-                      children: [
-                        // Top heading display section with Feng Shui info
-                        _buildHeadingDisplaySection(controller),
-                        
-                        // Main Compass Area - Fixed spacing layout with overflow protection
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return SingleChildScrollView(
-                                physics: const NeverScrollableScrollPhysics(), // Disable scroll but prevent overflow
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Compass widget - fixed size
-                                      _buildCompassSection(controller),
-                                      
-                                      // Fixed gap below compass
-                                      SizedBox(height: 36.ch),
-                                      
-                                      // Direction meaning text
-                                      _buildDirectionMeaningText(controller),
-                                    ],
-                                  ),
+      backgroundColor: CompassUITheme.backgroundColor,
+      appBar: _buildAppBar(),
+      resizeToAvoidBottomInset: false, // Prevent resize when keyboard shows
+      body: Column(
+        children: [
+          // Main content area with SafeArea for top only
+          Expanded(
+            child: SafeArea(
+              bottom: false, // Don't apply SafeArea to bottom
+              child: Screenshot(
+                controller: controller.screenshotController,
+                child: Container(
+                  width: double.infinity,
+                  color: const Color(
+                      0xFF020931), // Match app background for clean screenshot
+                  child: Column(
+                    children: [
+                      // Top heading display section with Feng Shui info
+                      _buildHeadingDisplaySection(controller, isTablet),
+
+                      // Main Compass Area - Fixed spacing layout with overflow protection
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              physics:
+                                  const NeverScrollableScrollPhysics(), // Disable scroll but prevent overflow
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
                                 ),
-                              );
-                            },
-                          ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                      // Compass widget - fixed size
+                                      _buildCompassSection(context, controller, isTablet),
+
+                                    // Fixed gap below compass
+                                    SizedBox(height: 36.ch),
+
+                                    // Direction meaning text
+                                    _buildDirectionMeaningText(controller),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            
-            // Bottom action buttons - OUTSIDE SafeArea to stick to bottom
-            _buildBottomActionButtons(context, controller),
-          ],
-        ),
-      );
+          ),
+
+          // Bottom action buttons - OUTSIDE SafeArea to stick to bottom
+          _buildBottomActionButtons(context, controller),
+        ],
+      ),
+    );
   }
 
   /// Build top heading display section with Feng Shui direction info
-  Widget _buildHeadingDisplaySection(CompassController controller) {
+  Widget _buildHeadingDisplaySection(
+      CompassController controller, bool isTablet) {
     // Adjust height based on screen size to prevent overlap
     final isSmallScreen = CompassResponsive.screenHeight < 700;
-    final sectionHeight = isSmallScreen ? 100.ch : 140.ch;
-    
+    final sectionHeight = isSmallScreen ? 100.ch : (isTablet ? 160.ch : 140.ch);
+
     return SizedBox(
       height: sectionHeight,
       child: Stack(
         children: [
           // Column with degree box and direction text - positioned with proper spacing from app bar
           Positioned(
-            top: isSmallScreen ? 10.ch : 27.ch, // Adjust top spacing for small screens
+            top: isSmallScreen
+                ? 10.ch
+                : 27.ch, // Adjust top spacing for small screens
             left: 0,
             right: 0,
             child: Column(
@@ -128,7 +136,8 @@ class PersonalCompassView extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 12.cw, vertical: 8.ch),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.cw, vertical: 8.ch),
                     child: Center(
                       child: Obx(() {
                         final heading = controller.compassData.heading;
@@ -179,25 +188,25 @@ class PersonalCompassView extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Gap 16px between degree box and direction text
                 SizedBox(height: 16.ch),
-                
+
                 // Direction text (basic direction only, feng shui info moved below compass)
                 Obx(() => Text(
-                  'Hướng: ${controller.currentDirection?.vietnameseName ?? '--'} (${controller.currentDirection?.chineseName ?? '--'})',
-                  style: TextStyle(
-                    fontSize: 24.csp, // Font size 24
-                    fontWeight: FontWeight.w700, // Weight 700
-                    color: const Color(0xFFFFCD45), // Gold color
-                    fontFamily: 'SVN Gilroy',
-                  ),
-                  textAlign: TextAlign.center,
-                )),
+                      'Hướng: ${controller.currentDirection?.vietnameseName ?? '--'} (${controller.currentDirection?.chineseName ?? '--'})',
+                      style: TextStyle(
+                        fontSize: 24.csp, // Font size 24
+                        fontWeight: FontWeight.w700, // Weight 700
+                        color: const Color(0xFFFFCD45), // Gold color
+                        fontFamily: 'SVN Gilroy',
+                      ),
+                      textAlign: TextAlign.center,
+                    )),
               ],
             ),
           ),
-          
+
           // Lock icon button - positioned at top:27, right:16
           Positioned(
             top: isSmallScreen ? 10.ch : 27.ch,
@@ -241,25 +250,25 @@ class PersonalCompassView extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.all(8.cw),
                       child: Obx(() => ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFFF5E29F),
-                            Color(0xFFDEC87D),
-                            Color(0xFFD3AA45),
-                            Color(0xFFF2DC98),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds),
-                        child: Image.asset(
-                          controller.isRotationLocked 
-                            ? CompassPath.lockIcon
-                            : CompassPath.unlockIcon,
-                          width: 20.cw,
-                          height: 20.cw,
-                          color: Colors.white, // Will be masked by gradient
-                        ),
-                      )),
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: [
+                                Color(0xFFF5E29F),
+                                Color(0xFFDEC87D),
+                                Color(0xFFD3AA45),
+                                Color(0xFFF2DC98),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ).createShader(bounds),
+                            child: Image.asset(
+                              controller.isRotationLocked
+                                  ? CompassPath.lockIcon
+                                  : CompassPath.unlockIcon,
+                              width: 20.cw,
+                              height: 20.cw,
+                              color: Colors.white, // Will be masked by gradient
+                            ),
+                          )),
                     ),
                   ),
                 ),
@@ -291,21 +300,29 @@ class PersonalCompassView extends StatelessWidget {
     );
   }
 
-  Widget _buildCompassSection(CompassController controller) {
+  Widget _buildCompassSection(BuildContext context, CompassController controller, bool isTablet) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final topPadding = isTablet ? 28.ch : 0.0;
+    final maxCompassHeight = screenHeight * (isTablet ? 0.55 : 0.65);
+    final baseWidth = screenWidth - 16.cw;
+    final compassSize = math.min(baseWidth, maxCompassHeight);
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 8.cw), // Only 8px horizontal padding
+      padding: EdgeInsets.only(
+        left: 8.cw,
+        right: 8.cw,
+        top: topPadding,
+      ),
       child: Center(
-        child: AspectRatio(
-          aspectRatio: 1.0, // Perfect square
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return PersonalZoomableImageCompass(
-                size: (MediaQuery.of(context).size.width - 16.cw), // Full width minus padding
-                minZoom: 1.0,
-                maxZoom: 3.0,
-              );
-            },
+        child: SizedBox(
+          width: compassSize,
+          height: compassSize,
+          child: PersonalZoomableImageCompass(
+            size: compassSize,
+            minZoom: 1.0,
+            maxZoom: 3.0,
           ),
         ),
       ),
@@ -313,9 +330,10 @@ class PersonalCompassView extends StatelessWidget {
   }
 
   /// Build bottom action buttons with personal info display - sticky container 80px height
-  Widget _buildBottomActionButtons(BuildContext context, CompassController controller) {
+  Widget _buildBottomActionButtons(
+      BuildContext context, CompassController controller) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
+
     return Container(
       width: double.infinity, // Full width to cover entire screen
       height: 80.ch + bottomPadding, // Fixed height 80px + safe area bottom
@@ -323,7 +341,8 @@ class PersonalCompassView extends StatelessWidget {
         color: const Color(0xFF020931), // Background color
         border: Border(
           top: BorderSide(
-            color: const Color(0xFF7E88C3).withOpacity(0.5), // Top border 50% opacity
+            color: const Color(0xFF7E88C3)
+                .withOpacity(0.5), // Top border 50% opacity
             width: 1,
           ),
         ),
@@ -347,10 +366,10 @@ class PersonalCompassView extends StatelessWidget {
                   iconAsset: CompassPath.zoomOutIcon,
                   onTap: () => controller.triggerZoomOut(),
                 ),
-                
+
                 // Gap 12px between icons
                 SizedBox(width: 12.cw),
-                
+
                 // Zoom In button
                 _buildCircleButton(
                   iconAsset: CompassPath.zoomInIcon,
@@ -358,7 +377,7 @@ class PersonalCompassView extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // Center: Personal info display - "Nam 2002" style
             Obx(() {
               if (controller.hasPersonalInfo) {
@@ -369,72 +388,74 @@ class PersonalCompassView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20.csp,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFFFFDB60), // Color as requested #FFDB60
+                    color:
+                        const Color(0xFFFFDB60), // Color as requested #FFDB60
                     fontFamily: 'SVN Gilroy',
                   ),
                 );
               }
               return const SizedBox.shrink();
             }),
-            
+
             // Right side: Screenshot and Detail buttons
             Row(
               children: [
                 // Screenshot button with loading indicator
-                Obx(() => controller.isCapturingScreenshot
-                  ? Container(
-                      width: 40.cw,
-                      height: 40.cw,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(99.cr),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFDC24C),
-                            Color(0xFFFCF5D0),
-                            Color(0xFFD78F40),
-                            Color(0xFFFFFACA),
-                            Color(0xFFD78F40),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Container(
-                        margin: EdgeInsets.all(1.cw),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(99.cr),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF101847),
-                              Color(0xFF303C7B),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                Obx(
+                  () => controller.isCapturingScreenshot
+                      ? Container(
+                          width: 40.cw,
+                          height: 40.cw,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(99.cr),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFFDC24C),
+                                Color(0xFFFCF5D0),
+                                Color(0xFFD78F40),
+                                Color(0xFFFFFACA),
+                                Color(0xFFD78F40),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: SizedBox(
-                            width: 20.cw,
-                            height: 20.cw,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFFF5E29F),
+                          child: Container(
+                            margin: EdgeInsets.all(1.cw),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(99.cr),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF101847),
+                                  Color(0xFF303C7B),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Center(
+                              child: SizedBox(
+                                width: 20.cw,
+                                height: 20.cw,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFFF5E29F),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
+                        )
+                      : _buildCircleButton(
+                          iconAsset: CompassPath.screenshotIcon,
+                          onTap: () => _takeScreenshot(controller),
                         ),
-                      ),
-                    )
-                  : _buildCircleButton(
-                      iconAsset: CompassPath.screenshotIcon,
-                      onTap: () => _takeScreenshot(controller),
-                    ),
                 ),
-                
+
                 // Gap 12px between icons
                 SizedBox(width: 12.cw),
-                
+
                 // Detail button
                 _buildCircleButton(
                   iconAsset: CompassPath.detailIcon,
@@ -455,10 +476,11 @@ class PersonalCompassView extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     // Use minimum of width/height scale to ensure buttons stay circular
-    final buttonSize = 40 * (CompassResponsive.scaleWidth < CompassResponsive.scaleHeight 
-        ? CompassResponsive.scaleWidth 
-        : CompassResponsive.scaleHeight);
-    
+    final buttonSize = 40 *
+        (CompassResponsive.scaleWidth < CompassResponsive.scaleHeight
+            ? CompassResponsive.scaleWidth
+            : CompassResponsive.scaleHeight);
+
     return Container(
       width: buttonSize,
       height: buttonSize,
@@ -507,17 +529,17 @@ class PersonalCompassView extends StatelessWidget {
                 end: Alignment.bottomRight,
               ).createShader(bounds),
               child: iconAsset != null
-                ? Image.asset(
-                    iconAsset,
-                    width: 20.cw,
-                    height: 20.cw,
-                    color: Colors.white, // Will be masked by gradient
-                  )
-                : Icon(
-                    icon,
-                    color: Colors.white, // Will be masked by gradient
-                    size: 28.cw,
-                  ),
+                  ? Image.asset(
+                      iconAsset,
+                      width: 20.cw,
+                      height: 20.cw,
+                      color: Colors.white, // Will be masked by gradient
+                    )
+                  : Icon(
+                      icon,
+                      color: Colors.white, // Will be masked by gradient
+                      size: 28.cw,
+                    ),
             ),
           ),
         ),
@@ -541,12 +563,12 @@ class PersonalCompassView extends StatelessWidget {
   void _takeScreenshot(CompassController controller) {
     controller.takeCompassScreenshot();
   }
-  
+
   /// Navigate to detail view
   void _navigateToDetail(CompassController controller) {
     Get.to(() => PersonalCompassDetailView());
   }
-  
+
   /// Build direction meaning text widget
   Widget _buildDirectionMeaningText(CompassController controller) {
     return Container(
@@ -556,12 +578,12 @@ class PersonalCompassView extends StatelessWidget {
       child: Center(
         child: Obx(() {
           final fengShuiDirection = controller.getCurrentFengShuiDirection();
-          
+
           if (fengShuiDirection == null) {
             // Return empty container with same height to maintain layout
             return const SizedBox();
           }
-          
+
           // Get quality text (Tốt/Xấu/Tốt nhất/Rất xấu)
           String quality = "";
           if (fengShuiDirection.isGood) {
@@ -577,10 +599,11 @@ class PersonalCompassView extends StatelessWidget {
               quality = "Xấu";
             }
           }
-          
+
           // Get short description based on type
-          String shortDescription = _getShortDescription(fengShuiDirection.type);
-          
+          String shortDescription =
+              _getShortDescription(fengShuiDirection.type);
+
           return Text(
             '${fengShuiDirection.name} ($quality): $shortDescription',
             style: TextStyle(
@@ -598,7 +621,7 @@ class PersonalCompassView extends StatelessWidget {
       ),
     );
   }
-  
+
   /// Get short description for each feng shui direction type
   String _getShortDescription(FengShuiDirectionType type) {
     switch (type) {

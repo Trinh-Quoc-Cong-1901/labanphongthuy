@@ -57,12 +57,28 @@ class ChatAIService {
   }
 
   bool _isGreeting(String message) {
-    final greetingKeywords = ['xin chào', 'chào', 'hello', 'hi', 'chào bạn', 'xin chao'];
+    final greetingKeywords = [
+      'xin chào',
+      'chào',
+      'hello',
+      'hi',
+      'chào bạn',
+      'xin chao'
+    ];
     return greetingKeywords.any((keyword) => message.contains(keyword));
   }
 
   bool _isCompassRelated(String message) {
-    final compassKeywords = ['la bàn', 'la ban', 'compass', 'hướng', 'đông', 'tây', 'nam', 'bắc'];
+    final compassKeywords = [
+      'la bàn',
+      'la ban',
+      'compass',
+      'hướng',
+      'đông',
+      'tây',
+      'nam',
+      'bắc'
+    ];
     return compassKeywords.any((keyword) => message.contains(keyword));
   }
 
@@ -72,7 +88,16 @@ class ChatAIService {
   }
 
   bool _isHomeRelated(String message) {
-    final homeKeywords = ['nhà', 'phòng', 'cửa', 'giường', 'bếp', 'toilet', 'phòng ngủ', 'phòng khách'];
+    final homeKeywords = [
+      'nhà',
+      'phòng',
+      'cửa',
+      'giường',
+      'bếp',
+      'toilet',
+      'phòng ngủ',
+      'phòng khách'
+    ];
     return homeKeywords.any((keyword) => message.contains(keyword));
   }
 

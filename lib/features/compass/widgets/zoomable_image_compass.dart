@@ -29,33 +29,34 @@ class ZoomableImageCompass extends StatefulWidget {
   State<ZoomableImageCompass> createState() => _ZoomableImageCompassState();
 }
 
-class _ZoomableImageCompassState extends State<ZoomableImageCompass> 
+class _ZoomableImageCompassState extends State<ZoomableImageCompass>
     with TickerProviderStateMixin {
   // Static compass image widget - created once, never rebuilt
   late final Widget _staticCompassImage;
-  
+
   // Zoom control
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   late AnimationController _zoomAnimationController;
   Animation<Matrix4>? _zoomAnimation;
-  
+
   // Current zoom level for UI feedback
   double _currentZoom = 1.0;
-  
+
   @override
   void initState() {
     super.initState();
     _staticCompassImage = _createStaticCompassImage();
-    
+
     // Initialize zoom animation controller
     _zoomAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     // Listen to transformation changes
     _transformationController.addListener(_onTransformationChanged);
-    
+
     // Listen to zoom trigger from controller
     _listenToZoomTrigger();
   }
@@ -91,11 +92,11 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
   void _onTransformationChanged() {
     final matrix = _transformationController.value;
     final newZoom = matrix.getMaxScaleOnAxis();
-    
+
     // Only update if zoom changed significantly (performance optimization)
     if ((_currentZoom - newZoom).abs() > 0.01) {
       _currentZoom = newZoom;
-      
+
       // Update controller zoom state (no setState needed since no UI depends on it)
       final controller = Get.find<CompassController>();
       controller.setZoomLevel(newZoom);
@@ -105,7 +106,7 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CompassController>();
-    
+
     return SizedBox(
       width: widget.size,
       height: widget.size,
@@ -116,7 +117,8 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
           // Zoomable compass with rotation - wrap with GestureDetector for double-tap
           GestureDetector(
             onDoubleTap: () {
-              final currentZoom = _transformationController.value.getMaxScaleOnAxis();
+              final currentZoom =
+                  _transformationController.value.getMaxScaleOnAxis();
               final targetZoom = currentZoom > 1.5 ? 1.0 : 2.0;
               _animateZoomTo(targetZoom);
             },
@@ -132,47 +134,46 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
               clipBehavior: Clip.none,
               // No boundary margin needed since panning is disabled
               boundaryMargin: EdgeInsets.zero,
-            child: SizedBox(
-              width: widget.size,
-              height: widget.size,
-              child: Stack(
-                alignment: Alignment.center,
-                clipBehavior: Clip.none,
-                children: [
-                  // Rotating compass image with smooth animation
-                  Obx(() => SmoothRotationTransition(
-                    angle: controller.isRotationLocked 
-                        ? controller.lockedAngle * math.pi / 180
-                        : controller.rotationAngle * math.pi / 180,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOutQuad,
-                    child: _staticCompassImage,
-                  )),
-                  
-                  // Fixed crosshair lines - zoom with compass but don't rotate
-                  _buildCrosshairLines(),
-                  
-                  // Triangle indicator at top - zoom with compass but don't rotate
-                  _buildTriangleIndicator(),
-                ],
+              child: SizedBox(
+                width: widget.size,
+                height: widget.size,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Rotating compass image with smooth animation
+                    Obx(() => SmoothRotationTransition(
+                          angle: controller.isRotationLocked
+                              ? controller.lockedAngle * math.pi / 180
+                              : controller.rotationAngle * math.pi / 180,
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeOutQuad,
+                          child: _staticCompassImage,
+                        )),
+
+                    // Fixed crosshair lines - zoom with compass but don't rotate
+                    _buildCrosshairLines(),
+
+                    // Triangle indicator at top - zoom with compass but don't rotate
+                    _buildTriangleIndicator(),
+                  ],
+                ),
               ),
             ),
-          ),
           ),
         ],
       ),
     );
   }
 
-
-
   /// Create static compass image - called once only in initState
   Widget _createStaticCompassImage() {
     // Basic compass always uses base_compass.png
     // Personal compass uses PersonalZoomableImageCompass for dynamic selection
     final imagePath = CompassPath.baseCompass;
-        
-    return RepaintBoundary( // Critical: prevents repaints during rotation
+
+    return RepaintBoundary(
+      // Critical: prevents repaints during rotation
       child: Image.asset(
         imagePath,
         width: widget.size,
@@ -183,8 +184,8 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
         cacheHeight: (widget.size * 4).round(),
         // Handle loading
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          return wasSynchronouslyLoaded 
-              ? child 
+          return wasSynchronouslyLoaded
+              ? child
               : AnimatedOpacity(
                   opacity: frame == null ? 0 : 1,
                   duration: const Duration(milliseconds: 200),
@@ -245,7 +246,8 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
         children: [
           // Vertical line: 0° to 180° (North to South)
           Positioned(
-            left: widget.size / 2 - 1, // Center horizontally, minus half line width
+            left: widget.size / 2 -
+                1, // Center horizontally, minus half line width
             top: 0,
             child: Container(
               width: 2,
@@ -253,11 +255,12 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
               color: const Color(0xFFAC3737).withOpacity(0.7),
             ),
           ),
-          
+
           // Horizontal line: 90° to 270° (East to West)
           Positioned(
             left: 0,
-            top: widget.size / 2 - 1, // Center vertically, minus half line width
+            top:
+                widget.size / 2 - 1, // Center vertically, minus half line width
             child: Container(
               width: widget.size,
               height: 2,
@@ -273,7 +276,8 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
   Widget _buildTriangleIndicator() {
     return Positioned(
       top: -20.ch, // Push triangle higher up
-      left: widget.size / 2 - 14.cw, // Center horizontally, minus half triangle width
+      left: widget.size / 2 -
+          14.cw, // Center horizontally, minus half triangle width
       child: Image.asset(
         CompassPath.triangleIndicator,
         width: 28.cw,
@@ -314,12 +318,12 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
   void resetZoom() {
     _animateZoomTo(1.0);
   }
-  
+
   // Get current zoom level
   double getCurrentZoom() {
     return _transformationController.value.getMaxScaleOnAxis();
   }
-  
+
   // Quick zoom to specific level
   void zoomTo(double zoom) {
     _animateZoomTo(zoom.clamp(widget.minZoom, widget.maxZoom));
@@ -329,21 +333,23 @@ class _ZoomableImageCompassState extends State<ZoomableImageCompass>
   void _animateZoomTo(double targetZoom) {
     final currentMatrix = _transformationController.value;
     final currentZoom = currentMatrix.getMaxScaleOnAxis();
-    
+
     if ((targetZoom - currentZoom).abs() < 0.01) return;
 
     // Calculate center point of the compass
     final centerX = widget.size / 2;
     final centerY = widget.size / 2;
-    
+
     // Get current translation
     final currentTranslation = currentMatrix.getTranslation();
-    
+
     // Calculate new translation to keep center point fixed during zoom
     final zoomRatio = targetZoom / currentZoom;
-    final newTranslationX = currentTranslation.x + (centerX - currentTranslation.x) * (1 - zoomRatio);
-    final newTranslationY = currentTranslation.y + (centerY - currentTranslation.y) * (1 - zoomRatio);
-    
+    final newTranslationX = currentTranslation.x +
+        (centerX - currentTranslation.x) * (1 - zoomRatio);
+    final newTranslationY = currentTranslation.y +
+        (centerY - currentTranslation.y) * (1 - zoomRatio);
+
     // Create target matrix that zooms into center
     final targetMatrix = Matrix4.identity()
       ..translate(newTranslationX, newTranslationY)
