@@ -27,11 +27,15 @@ class ChatView extends StatelessWidget {
                 return Scaffold(
                   backgroundColor: CompassUITheme.backgroundColor,
                   appBar: _buildAppBar(controller, isLandscape),
-                  drawer: isLandscape ? null : _buildDrawer(context), // Hide drawer in landscape
+                  drawer: isLandscape
+                      ? null
+                      : _buildDrawer(context), // Hide drawer in landscape
                   body: isLandscape
                       ? _buildLandscapeBody(controller)
-                      : _buildBody(controller),
-                  endDrawer: isLandscape ? _buildDrawer(context) : null, // Show as end drawer in landscape
+                      : _buildBody(context, controller),
+                  endDrawer: isLandscape
+                      ? _buildDrawer(context)
+                      : null, // Show as end drawer in landscape
                 );
               },
             );
@@ -41,12 +45,14 @@ class ChatView extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(ChatController controller, [bool isLandscape = false]) {
+  PreferredSizeWidget _buildAppBar(ChatController controller,
+      [bool isLandscape = false]) {
     return AppBar(
       backgroundColor: CompassUITheme.backgroundColor,
       elevation: 0,
       iconTheme: const IconThemeData(color: Colors.white),
-      toolbarHeight: isLandscape ? 56.h : 56.h, // Adjustable height based on orientation
+      toolbarHeight:
+          isLandscape ? 56.h : 56.h, // Adjustable height based on orientation
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Get.back(),
@@ -191,12 +197,12 @@ class ChatView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Obx(() => Text(
-                      'Tổng số: ${controller.conversationHistory.length} cuộc trò chuyện',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12.sp,
-                      ),
-                    )),
+                          'Tổng số: ${controller.conversationHistory.length} cuộc trò chuyện',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12.sp,
+                          ),
+                        )),
                     IconButton(
                       icon: Icon(Icons.close, size: 20.sp),
                       onPressed: () => Navigator.of(context).pop(),
@@ -308,7 +314,7 @@ class ChatView extends StatelessWidget {
     }
   }
 
-  Widget _buildBody(ChatController controller) {
+  Widget _buildBody(BuildContext context, ChatController controller) {
     return SafeArea(
       top: false, // AppBar handles top safe area
       child: Column(
@@ -327,7 +333,7 @@ class ChatView extends StatelessWidget {
                       _buildMessageBubble(controller.messages[index]),
                 )),
           ),
-          _buildSuggestedQuestions(controller),
+          _buildSuggestedQuestions(context, controller),
           _buildMessageInput(controller),
         ],
       ),
@@ -347,7 +353,8 @@ class ChatView extends StatelessWidget {
                 Expanded(
                   child: Obx(() => ListView.builder(
                         controller: controller.scrollController,
-                        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24.w, vertical: 16.h),
                         itemCount: controller.messages.length,
                         itemBuilder: (context, index) =>
                             _buildMessageBubble(controller.messages[index]),
@@ -359,13 +366,17 @@ class ChatView extends StatelessWidget {
           ),
           // Suggested questions sidebar in landscape
           Container(
-            width: 1.sw > 1024 ? 350.w : 300.w, // Adaptive width based on screen size
+            width: 1.sw > 1024
+                ? 350.w
+                : 300.w, // Adaptive width based on screen size
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              border: Border(left: BorderSide(color: Colors.grey[300]!, width: 1.w)),
+              border: Border(
+                  left: BorderSide(color: Colors.grey[300]!, width: 1.w)),
             ),
             child: SafeArea(
-              left: false, // Don't apply left safe area since it's not at the edge
+              left:
+                  false, // Don't apply left safe area since it's not at the edge
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -373,7 +384,9 @@ class ChatView extends StatelessWidget {
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1.h)),
+                      border: Border(
+                          bottom:
+                              BorderSide(color: Colors.grey[300]!, width: 1.h)),
                     ),
                     child: Row(
                       children: [
@@ -390,7 +403,8 @@ class ChatView extends StatelessWidget {
                         Builder(
                           builder: (context) => IconButton(
                             icon: Icon(Icons.close, size: 20.sp),
-                            onPressed: () => Scaffold.of(context).closeEndDrawer(),
+                            onPressed: () =>
+                                Scaffold.of(context).closeEndDrawer(),
                             color: Colors.grey[600],
                             tooltip: 'Đóng',
                           ),
@@ -411,7 +425,7 @@ class ChatView extends StatelessWidget {
   }
 
   // Build suggested questions
-  Widget _buildSuggestedQuestions(ChatController controller) {
+  Widget _buildSuggestedQuestions(BuildContext context, ChatController controller) {
     return Obx(() {
       // Hide if no questions available
       if (controller.suggestedQuestions.isEmpty) {
@@ -419,18 +433,21 @@ class ChatView extends StatelessWidget {
       }
 
       // Only hide when we actually have user messages with real content
-      final userMessages = controller.messages.where((message) =>
-          message.role == MessageRole.user &&
-          message.content.isNotEmpty &&
-          !message.isLoading
-      ).toList();
+      final userMessages = controller.messages
+          .where((message) =>
+              message.role == MessageRole.user &&
+              message.content.isNotEmpty &&
+              !message.isLoading)
+          .toList();
 
       if (userMessages.isNotEmpty) {
         return const SizedBox.shrink();
       }
 
+      final isTablet = MediaQuery.of(context).size.shortestSide >= 768;
+      
       return Container(
-        height: 120.h,
+        height: isTablet ? 140.h : 120.h,
         padding: EdgeInsets.all(16.w),
         color: Colors.grey[50],
         child: ListView.builder(
@@ -495,11 +512,12 @@ class ChatView extends StatelessWidget {
       }
 
       // Only hide when we actually have user messages with real content
-      final userMessages = controller.messages.where((message) =>
-          message.role == MessageRole.user &&
-          message.content.isNotEmpty &&
-          !message.isLoading
-      ).toList();
+      final userMessages = controller.messages
+          .where((message) =>
+              message.role == MessageRole.user &&
+              message.content.isNotEmpty &&
+              !message.isLoading)
+          .toList();
 
       if (userMessages.isNotEmpty) {
         return Center(
@@ -575,11 +593,13 @@ class ChatView extends StatelessWidget {
           Flexible(
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: 1.sw * (1.sw > 768 ? 0.6 : 0.75), // Responsive max width
+                maxWidth:
+                    1.sw * (1.sw > 768 ? 0.6 : 0.75), // Responsive max width
               ),
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color: message.isFromUser ? const Color(0xFFFDC24C) : Colors.white,
+                color:
+                    message.isFromUser ? const Color(0xFFFDC24C) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16.r),
                   topRight: Radius.circular(16.r),
