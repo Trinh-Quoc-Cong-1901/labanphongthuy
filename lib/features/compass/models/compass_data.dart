@@ -14,11 +14,11 @@ class CompassData extends Equatable {
   });
 
   factory CompassData.initial() => CompassData(
-    heading: 0.0,
-    magneticDeclination: 0.0,
-    isCalibrated: false,
-    timestamp: DateTime.now(),
-  );
+        heading: 0.0,
+        magneticDeclination: 0.0,
+        isCalibrated: false,
+        timestamp: DateTime.now(),
+      );
 
   CompassData copyWith({
     double? heading,
@@ -35,9 +35,10 @@ class CompassData extends Equatable {
   }
 
   double get trueHeading => (heading + magneticDeclination) % 360;
-  
+
   double get normalizedHeading => heading < 0 ? heading + 360 : heading;
 
   @override
-  List<Object?> get props => [heading, magneticDeclination, isCalibrated, timestamp];
+  List<Object?> get props =>
+      [heading, magneticDeclination, isCalibrated, timestamp];
 }

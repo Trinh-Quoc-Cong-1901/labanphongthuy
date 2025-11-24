@@ -122,9 +122,8 @@ class NotificationEvent {
           ? SimpleNotificationConfig.fromJson(json['simpleNotificationConfig'])
           : null,
       customReminders: json['customReminders'] != null
-          ? List<CustomReminderConfig>.from(
-              json['customReminders']
-                  .map((x) => CustomReminderConfig.fromJson(x)))
+          ? List<CustomReminderConfig>.from(json['customReminders']
+              .map((x) => CustomReminderConfig.fromJson(x)))
           : null,
       payload: json['payload'],
     );

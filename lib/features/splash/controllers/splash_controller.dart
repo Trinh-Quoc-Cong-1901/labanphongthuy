@@ -15,7 +15,8 @@ class SplashController extends GetxController {
       await Future.delayed(const Duration(milliseconds: 1000));
 
       // Progressive navigation logic like thansohoc
-      final isOnboardingCompleted = await OnboardingService.isOnboardingCompleted();
+      final isOnboardingCompleted =
+          await OnboardingService.isOnboardingCompleted();
 
       if (isOnboardingCompleted) {
         // Go directly to main compass selection

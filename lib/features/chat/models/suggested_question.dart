@@ -33,12 +33,12 @@ class SuggestedQuestion extends Equatable {
 
 // Predefined categories for suggested questions - Feng Shui specific
 enum QuestionCategory {
-  laBan,        // La bàn & Hướng
-  nhaO,         // Phong thủy nhà ở
-  vanPhong,     // Phong thủy văn phòng
-  mauSac,       // Màu sắc may mắn
-  ngayTot,      // Ngày tốt/xấu
-  tongQuat,     // Tổng quát (general questions)
+  laBan, // La bàn & Hướng
+  nhaO, // Phong thủy nhà ở
+  vanPhong, // Phong thủy văn phòng
+  mauSac, // Màu sắc may mắn
+  ngayTot, // Ngày tốt/xấu
+  tongQuat, // Tổng quát (general questions)
 }
 
 // Extension to get display name

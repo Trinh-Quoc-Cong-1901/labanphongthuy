@@ -124,15 +124,14 @@ class ChatService extends GetxService {
     await _databaseProvider.openBox<String>(_suggestedQuestionsBoxName);
 
     // Check version and update suggested questions if needed
-    final storedVersion =
-        _databaseProvider.getValue<int>(
+    final storedVersion = _databaseProvider.getValue<int>(
           _suggestedQuestionsBoxName,
           'version',
         ) ??
         0;
     final hasQuestions =
         _databaseProvider.getValue(_suggestedQuestionsBoxName, 'questions') !=
-        null;
+            null;
 
     if (!hasQuestions || storedVersion < _suggestedQuestionsVersion) {
       await _initializeSuggestedQuestions();
@@ -247,19 +246,26 @@ class ChatService extends GetxService {
 
   // Get suggested questions
   List<SuggestedQuestion> getSuggestedQuestions({String? category}) {
+    LoggerUtils.debug('ChatService: Getting suggested questions from database...');
     final jsonList = _databaseProvider.getJsonList(
       _suggestedQuestionsBoxName,
       'questions',
     );
-    if (jsonList == null) return [];
+    if (jsonList == null) {
+      LoggerUtils.debug('ChatService: No suggested questions found in database');
+      return [];
+    }
 
     final allQuestions =
         jsonList.map((json) => SuggestedQuestion.fromJson(json)).toList();
 
     if (category != null) {
-      return allQuestions.where((q) => q.category == category).toList();
+      final filteredQuestions = allQuestions.where((q) => q.category == category).toList();
+      LoggerUtils.debug('ChatService: Returning ${filteredQuestions.length} questions for category: $category');
+      return filteredQuestions;
     }
 
+    LoggerUtils.debug('ChatService: Returning ${allQuestions.length} total suggested questions');
     return allQuestions;
   }
 
@@ -292,6 +298,29 @@ class ChatService extends GetxService {
       'questions',
       existingList.map((q) => q.toJson()).toList(),
     );
+  }
+
+  // Force clear and reinitialize all suggested questions
+  Future<void> forceResetSuggestedQuestions() async {
+    LoggerUtils.debug('ChatService: Force resetting suggested questions...');
+    try {
+      // Clear existing data
+      await _databaseProvider.deleteValue(_suggestedQuestionsBoxName, 'questions');
+      await _databaseProvider.deleteValue(_suggestedQuestionsBoxName, 'version');
+      LoggerUtils.debug('ChatService: Cleared existing suggested questions data');
+
+      // Reinitialize
+      await _initializeSuggestedQuestions();
+      await _databaseProvider.putValue<int>(
+        _suggestedQuestionsBoxName,
+        'version',
+        _suggestedQuestionsVersion,
+      );
+      LoggerUtils.debug('ChatService: Force reset completed');
+    } catch (e) {
+      LoggerUtils.error('ChatService: Error in force reset', e);
+      rethrow;
+    }
   }
 
   // Get all conversations for a user
@@ -473,8 +502,7 @@ class ChatService extends GetxService {
       }
     }
 
-    final errorMessage =
-        response.data?['message'] ??
+    final errorMessage = response.data?['message'] ??
         'Unknown error while creating chat participant';
     LoggerUtils.error('ChatService: Failed to create chat user: $errorMessage');
     throw Exception('Failed to create chat user: $errorMessage');

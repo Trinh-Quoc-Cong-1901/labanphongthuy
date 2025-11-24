@@ -9,7 +9,7 @@ void main() {
       expect(male1990.kuaNumber, isA<int>());
       expect(male1990.kuaNumber, greaterThan(0));
       expect(male1990.kuaNumber, lessThanOrEqualTo(9));
-      
+
       // Test female born in 1990
       final female1990 = PersonalInfo.calculate(1990, false);
       expect(female1990.kuaNumber, isA<int>());

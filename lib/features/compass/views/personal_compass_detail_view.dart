@@ -12,7 +12,7 @@ class PersonalCompassDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CompassController>();
-    
+
     // Get data once outside of Obx to avoid rebuilds
     if (!controller.hasPersonalInfo || controller.fengShuiResult == null) {
       return Scaffold(
@@ -44,13 +44,13 @@ class PersonalCompassDetailView extends StatelessWidget {
         ),
       );
     }
-    
+
     // Get snapshot of current values - won't update in real-time
     final personalInfo = controller.fengShuiResult!.personalInfo;
     final currentDirection = controller.currentDirection;
     final currentFengShuiDirection = controller.getCurrentFengShuiDirection();
     final headingDegrees = controller.headingText;
-    
+
     return Scaffold(
       backgroundColor: CompassUITheme.backgroundColor,
       appBar: AppBar(
@@ -78,235 +78,233 @@ class PersonalCompassDetailView extends StatelessWidget {
             bottom: 32.ch,
           ),
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User info section
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '📋 ',
-                      style: TextStyle(fontSize: 18.csp),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Thông tin người dùng:',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 18.csp,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'SVN Gilroy',
-                            ),
-                          ),
-                          SizedBox(height: 12.ch),
-                          Text(
-                            '• Năm sinh: ${personalInfo.birthYear} (${_getZodiacYear(personalInfo.birthYear)})',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 16.csp,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'SVN Gilroy',
-                              height: 1.5,
-                            ),
-                          ),
-                          Text(
-                            '• Giới tính: ${personalInfo.isMale ? "Nam" : "Nữ"}',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 16.csp,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'SVN Gilroy',
-                              height: 1.5,
-                            ),
-                          ),
-                          Text(
-                            '• Mệnh quái: ${_getKuaName(personalInfo.kuaNumber)} – thuộc ${_getDestinyGroupName(personalInfo.destinyGroup)}',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 16.csp,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'SVN Gilroy',
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 16.ch),
-                
-                // Current direction section
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '📍 ',
-                      style: TextStyle(fontSize: 18.csp),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Hướng đo được: ${currentDirection?.vietnameseName ?? "--"} – $headingDegrees',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 18.csp,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'SVN Gilroy',
-                            ),
-                          ),
-                          SizedBox(height: 12.ch),
-                          Text(
-                            '• Góc $headingDegrees rơi vào hướng ${currentDirection?.vietnameseName ?? "--"} (${currentDirection?.chineseName ?? "--"}).',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 16.csp,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'SVN Gilroy',
-                              height: 1.5,
-                            ),
-                          ),
-                          if (currentFengShuiDirection != null)
-                            Text(
-                              '• Với người có mệnh ${_getKuaName(personalInfo.kuaNumber)}, hướng ${currentDirection?.vietnameseName ?? "--"} tương ứng với cung ${currentFengShuiDirection.name}.',
-                              style: TextStyle(
-                                color: const Color(0xFFFFFAED),
-                                fontSize: 16.csp,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SVN Gilroy',
-                                height: 1.5,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 16.ch),
-                
-                // Directions meaning section
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '🧭 ',
-                      style: TextStyle(fontSize: 18.csp),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ý nghĩa các cung trên la bàn:',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 18.csp,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'SVN Gilroy',
-                            ),
-                          ),
-                          SizedBox(height: 12.ch),
-                          Text(
-                            'Các cung được chia làm 8 hướng ứng với 8 quẻ bát quái – mỗi hướng lại có một ý nghĩa cát hoặc hung khác nhau, tùy theo mệnh của từng người. Với người mệnh ${_getKuaName(personalInfo.kuaNumber)}, các hướng có ý nghĩa như sau:',
-                            style: TextStyle(
-                              color: const Color(0xFFFFFAED),
-                              fontSize: 16.csp,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'SVN Gilroy',
-                              height: 1.5,
-                            ),
-                          ),
-                          SizedBox(height: 8.ch),
-                          
-                          // Dynamic directions based on user's Kua with fixed descriptions
-                          ...controller.fengShuiResult!.goodDirections.map((direction) =>
-                            _buildDirectionItem(direction, true)
-                          ),
-                          
-                          ...controller.fengShuiResult!.badDirections.map((direction) =>
-                            _buildDirectionItem(direction, false)
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 16.ch),
-                
-                // Conclusion section
-                if (currentFengShuiDirection != null)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '👉 ',
-                        style: TextStyle(fontSize: 18.csp),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Kết luận tại vị trí đo $headingDegrees:',
-                              style: TextStyle(
-                                color: const Color(0xFFFFFAED),
-                                fontSize: 18.csp,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'SVN Gilroy',
-                              ),
-                            ),
-                            SizedBox(height: 12.ch),
-                            Text(
-                              '• Bạn đang đối mặt với hướng ${currentFengShuiDirection.name} – ${_getConclusionQuality(currentFengShuiDirection)} theo Bát Trạch.',
-                              style: TextStyle(
-                                color: const Color(0xFFFFFAED),
-                                fontSize: 16.csp,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SVN Gilroy',
-                                height: 1.5,
-                              ),
-                            ),
-                            Text(
-                              '• Hướng này đại diện cho: ${_getConclusionMeaning(currentFengShuiDirection)}.',
-                              style: TextStyle(
-                                color: const Color(0xFFFFFAED),
-                                fontSize: 16.csp,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SVN Gilroy',
-                                height: 1.5,
-                              ),
-                            ),
-                            Text(
-                              '• ${currentFengShuiDirection.isGood ? "Phù hợp để" : "Không phù hợp để"}: ${_getConclusionRecommendation(currentFengShuiDirection)}.',
-                              style: TextStyle(
-                                color: const Color(0xFFFFFAED),
-                                fontSize: 16.csp,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'SVN Gilroy',
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // User info section
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '📋 ',
+                    style: TextStyle(fontSize: 18.csp),
                   ),
-              ],
-            ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Thông tin người dùng:',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 18.csp,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'SVN Gilroy',
+                          ),
+                        ),
+                        SizedBox(height: 12.ch),
+                        Text(
+                          '• Năm sinh: ${personalInfo.birthYear} (${_getZodiacYear(personalInfo.birthYear)})',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 16.csp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SVN Gilroy',
+                            height: 1.5,
+                          ),
+                        ),
+                        Text(
+                          '• Giới tính: ${personalInfo.isMale ? "Nam" : "Nữ"}',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 16.csp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SVN Gilroy',
+                            height: 1.5,
+                          ),
+                        ),
+                        Text(
+                          '• Mệnh quái: ${_getKuaName(personalInfo.kuaNumber)} – thuộc ${_getDestinyGroupName(personalInfo.destinyGroup)}',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 16.csp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SVN Gilroy',
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16.ch),
+
+              // Current direction section
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '📍 ',
+                    style: TextStyle(fontSize: 18.csp),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hướng đo được: ${currentDirection?.vietnameseName ?? "--"} – $headingDegrees',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 18.csp,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'SVN Gilroy',
+                          ),
+                        ),
+                        SizedBox(height: 12.ch),
+                        Text(
+                          '• Góc $headingDegrees rơi vào hướng ${currentDirection?.vietnameseName ?? "--"} (${currentDirection?.chineseName ?? "--"}).',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 16.csp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SVN Gilroy',
+                            height: 1.5,
+                          ),
+                        ),
+                        if (currentFengShuiDirection != null)
+                          Text(
+                            '• Với người có mệnh ${_getKuaName(personalInfo.kuaNumber)}, hướng ${currentDirection?.vietnameseName ?? "--"} tương ứng với cung ${currentFengShuiDirection.name}.',
+                            style: TextStyle(
+                              color: const Color(0xFFFFFAED),
+                              fontSize: 16.csp,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'SVN Gilroy',
+                              height: 1.5,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16.ch),
+
+              // Directions meaning section
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '🧭 ',
+                    style: TextStyle(fontSize: 18.csp),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ý nghĩa các cung trên la bàn:',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 18.csp,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'SVN Gilroy',
+                          ),
+                        ),
+                        SizedBox(height: 12.ch),
+                        Text(
+                          'Các cung được chia làm 8 hướng ứng với 8 quẻ bát quái – mỗi hướng lại có một ý nghĩa cát hoặc hung khác nhau, tùy theo mệnh của từng người. Với người mệnh ${_getKuaName(personalInfo.kuaNumber)}, các hướng có ý nghĩa như sau:',
+                          style: TextStyle(
+                            color: const Color(0xFFFFFAED),
+                            fontSize: 16.csp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SVN Gilroy',
+                            height: 1.5,
+                          ),
+                        ),
+                        SizedBox(height: 8.ch),
+
+                        // Dynamic directions based on user's Kua with fixed descriptions
+                        ...controller.fengShuiResult!.goodDirections.map(
+                            (direction) =>
+                                _buildDirectionItem(direction, true)),
+
+                        ...controller.fengShuiResult!.badDirections.map(
+                            (direction) =>
+                                _buildDirectionItem(direction, false)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16.ch),
+
+              // Conclusion section
+              if (currentFengShuiDirection != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '👉 ',
+                      style: TextStyle(fontSize: 18.csp),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Kết luận tại vị trí đo $headingDegrees:',
+                            style: TextStyle(
+                              color: const Color(0xFFFFFAED),
+                              fontSize: 18.csp,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'SVN Gilroy',
+                            ),
+                          ),
+                          SizedBox(height: 12.ch),
+                          Text(
+                            '• Bạn đang đối mặt với hướng ${currentFengShuiDirection.name} – ${_getConclusionQuality(currentFengShuiDirection)} theo Bát Trạch.',
+                            style: TextStyle(
+                              color: const Color(0xFFFFFAED),
+                              fontSize: 16.csp,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'SVN Gilroy',
+                              height: 1.5,
+                            ),
+                          ),
+                          Text(
+                            '• Hướng này đại diện cho: ${_getConclusionMeaning(currentFengShuiDirection)}.',
+                            style: TextStyle(
+                              color: const Color(0xFFFFFAED),
+                              fontSize: 16.csp,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'SVN Gilroy',
+                              height: 1.5,
+                            ),
+                          ),
+                          Text(
+                            '• ${currentFengShuiDirection.isGood ? "Phù hợp để" : "Không phù hợp để"}: ${_getConclusionRecommendation(currentFengShuiDirection)}.',
+                            style: TextStyle(
+                              color: const Color(0xFFFFFAED),
+                              fontSize: 16.csp,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'SVN Gilroy',
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
         ),
-      
+      ),
     );
   }
-
 
   Widget _buildDirectionItem(FengShuiDirectionResult direction, bool isGood) {
     // Get DirectionInfo from the static list
@@ -314,18 +312,20 @@ class PersonalCompassDetailView extends StatelessWidget {
       (info) => info.baGuaDirection == direction.direction,
       orElse: () => DirectionInfo.all.first,
     );
-    
+
     // Determine quality text
     String quality = "";
     if (isGood) {
-      quality = direction.type == FengShuiDirectionType.sinhKhi ? "Tốt nhất" : "Tốt";
+      quality =
+          direction.type == FengShuiDirectionType.sinhKhi ? "Tốt nhất" : "Tốt";
     } else {
-      quality = direction.type == FengShuiDirectionType.tuyetMenh ? "Rất xấu" : "Xấu";
+      quality =
+          direction.type == FengShuiDirectionType.tuyetMenh ? "Rất xấu" : "Xấu";
     }
-    
+
     // Get fixed description based on direction type
     String description = _getFixedDescription(direction.type);
-    
+
     return Padding(
       padding: EdgeInsets.only(bottom: 4.ch),
       child: Text(
@@ -364,15 +364,24 @@ class PersonalCompassDetailView extends StatelessWidget {
 
   String _getKuaName(int kuaNumber) {
     switch (kuaNumber) {
-      case 1: return 'Khảm (Thủy)';
-      case 2: return 'Khôn (Thổ)';
-      case 3: return 'Chấn (Mộc)';
-      case 4: return 'Tốn (Mộc)';
-      case 6: return 'Càn (Kim)';
-      case 7: return 'Đoài (Kim)';
-      case 8: return 'Cấn (Thổ)';
-      case 9: return 'Ly (Hỏa)';
-      default: return 'Không xác định';
+      case 1:
+        return 'Khảm (Thủy)';
+      case 2:
+        return 'Khôn (Thổ)';
+      case 3:
+        return 'Chấn (Mộc)';
+      case 4:
+        return 'Tốn (Mộc)';
+      case 6:
+        return 'Càn (Kim)';
+      case 7:
+        return 'Đoài (Kim)';
+      case 8:
+        return 'Cấn (Thổ)';
+      case 9:
+        return 'Ly (Hỏa)';
+      default:
+        return 'Không xác định';
     }
   }
 
@@ -387,25 +396,42 @@ class PersonalCompassDetailView extends StatelessWidget {
 
   String _getZodiacYear(int year) {
     final zodiacAnimals = [
-      'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ',
-      'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'
+      'Tý',
+      'Sửu',
+      'Dần',
+      'Mão',
+      'Thìn',
+      'Tỵ',
+      'Ngọ',
+      'Mùi',
+      'Thân',
+      'Dậu',
+      'Tuất',
+      'Hợi'
     ];
     final heavenlyStems = [
-      'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu',
-      'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'
+      'Giáp',
+      'Ất',
+      'Bính',
+      'Đinh',
+      'Mậu',
+      'Kỷ',
+      'Canh',
+      'Tân',
+      'Nhâm',
+      'Quý'
     ];
-    
+
     // Calculate Heavenly Stem (Can)
     final stemIndex = (year - 4) % 10;
     final stem = heavenlyStems[stemIndex];
-    
+
     // Calculate Earthly Branch (Chi)
     final branchIndex = (year - 4) % 12;
     final branch = zodiacAnimals[branchIndex];
-    
+
     return '$stem $branch';
   }
-
 
   String _getConclusionQuality(FengShuiDirectionResult direction) {
     if (direction.isGood) {

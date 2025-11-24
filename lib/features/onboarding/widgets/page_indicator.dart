@@ -19,7 +19,8 @@ class PageIndicator extends StatelessWidget {
       children: List.generate(
         totalPages,
         (index) => Container(
-          margin: EdgeInsets.symmetric(horizontal: OnboardingUITheme.indicatorSpacing / 2),
+          margin: EdgeInsets.symmetric(
+              horizontal: OnboardingUITheme.indicatorSpacing / 2),
           width: index == currentIndex
               ? OnboardingUITheme.indicatorWidth
               : OnboardingUITheme.indicatorHeight * 2,
@@ -28,7 +29,8 @@ class PageIndicator extends StatelessWidget {
             color: index == currentIndex
                 ? OnboardingUITheme.activeIndicatorColor
                 : OnboardingUITheme.inactiveIndicatorColor,
-            borderRadius: BorderRadius.circular(OnboardingUITheme.indicatorHeight / 2),
+            borderRadius:
+                BorderRadius.circular(OnboardingUITheme.indicatorHeight / 2),
           ),
         ),
       ),

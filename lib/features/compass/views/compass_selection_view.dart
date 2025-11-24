@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../utils/compass_responsive.dart';
 import '../../../config/assets_path.dart';
 import '../../../controllers/notification_controller.dart';
 
@@ -19,12 +19,19 @@ class CompassSelectionView extends StatelessWidget {
     // Initialize notification controller
     Get.put(NotificationController());
 
-    return Scaffold(
-      backgroundColor: CompassUITheme.backgroundColor,
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-      floatingActionButton: _buildChatButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), // iPhone 11 Pro design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor: CompassUITheme.backgroundColor,
+          appBar: _buildAppBar(),
+          body: _buildBody(),
+          floatingActionButton: _buildChatButton(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
+      },
     );
   }
 
@@ -43,7 +50,7 @@ class CompassSelectionView extends StatelessWidget {
       actions: [
         // Notification settings button
         Container(
-          margin: const EdgeInsets.only(right: 8),
+          margin: EdgeInsets.only(right: 8.w),
           child: Builder(
             builder: (context) {
               final notificationController = Get.find<NotificationController>();
@@ -77,8 +84,8 @@ class CompassSelectionView extends StatelessWidget {
           Text(
             'Hãy chọn la bàn phù hợp với công việc hoặc mục đích sử dụng của bạn',
             style: CompassUITheme.descriptionTextStyle.copyWith(
-              height: 26.ch /
-                  CompassUITheme.descriptionTextSize, // Line height 26px
+              fontSize: 16.sp, // Responsive font size
+              height: 1.6, // Simplified line height
             ),
             textAlign: TextAlign.center,
           ),
@@ -141,7 +148,7 @@ class CompassSelectionView extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        padding: EdgeInsets.all(1.cw), // 0.5px border width
+        padding: EdgeInsets.all(1.w), // Responsive border width
         child: Container(
           decoration: BoxDecoration(
             color: CompassUITheme.cardBackground,
@@ -149,49 +156,50 @@ class CompassSelectionView extends StatelessWidget {
                 BorderRadius.circular(CompassUITheme.cardBorderRadius),
           ),
           padding: EdgeInsets.symmetric(
-            vertical: CompassUITheme.cardVerticalPadding,
+            vertical: 24.h, // Responsive vertical padding
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Real compass image
               Container(
-                width: CompassUITheme.cardImageSize,
-                height: CompassUITheme.cardImageSize,
+                width: 120.w, // Responsive image size
+                height: 120.h, // Responsive image size
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.cr),
+                  borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 2),
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8.r,
+                      spreadRadius: 2.r,
+                      offset: Offset(0, 2.h),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.cr),
+                  borderRadius: BorderRadius.circular(12.r),
                   child: Image.asset(
                     imagePath,
-                    width: CompassUITheme.cardImageSize,
-                    height: CompassUITheme.cardImageSize,
+                    width: 120.w,
+                    height: 120.h,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        width: CompassUITheme.cardImageSize,
-                        height: CompassUITheme.cardImageSize,
+                        width: 120.w,
+                        height: 120.h,
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12.cr),
+                          color: Colors.grey.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
-                            color: Colors.grey.withOpacity(0.5),
-                            width: 1,
+                            color: Colors.grey.withValues(alpha: 0.5),
+                            width: 1.w,
                           ),
                         ),
                         child: Icon(
                           Icons.explore,
-                          size: 60.csp,
-                          color: CompassUITheme.cardLabelColor.withOpacity(0.7),
+                          size: 60.sp,
+                          color: CompassUITheme.cardLabelColor
+                              .withValues(alpha: 0.7),
                         ),
                       );
                     },
@@ -199,12 +207,14 @@ class CompassSelectionView extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: CompassUITheme.cardImageTextSpacing),
+              SizedBox(height: 16.h), // Responsive spacing
 
               // Card label
               Text(
                 title,
-                style: CompassUITheme.cardLabelStyle,
+                style: CompassUITheme.cardLabelStyle.copyWith(
+                  fontSize: 16.sp, // Responsive font size
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -226,7 +236,7 @@ class CompassSelectionView extends StatelessWidget {
             'CÀI ĐẶT THÔNG BÁO',
             textAlign: TextAlign.center,
             style: CompassUITheme.appBarTitleStyle.copyWith(
-              fontSize: 18,
+              fontSize: 18.sp, // Responsive font size
             ),
           ),
           content: Column(
@@ -241,32 +251,32 @@ class CompassSelectionView extends StatelessWidget {
                     subtitle: Text(
                       'Nhận lời khuyên và nhắc nhở hàng ngày',
                       style: CompassUITheme.descriptionTextStyle.copyWith(
-                        fontSize: 12,
+                        fontSize: 12.sp, // Responsive font size
                         color: Colors.grey[600],
                       ),
                     ),
                     value: controller.notificationsEnabled.value,
                     onChanged: (value) => controller.toggleNotifications(value),
-                    // activeThumbColor: const Color(0xFFFDC24C),
-                    contentPadding: const EdgeInsets.only(right: 1, left: 4),
+                    activeThumbColor: const Color(0xFFFDC24C),
+                    contentPadding: EdgeInsets.only(right: 1.w, left: 4.w),
                   )),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h), // Responsive spacing
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
                 'Đóng',
-                style: const TextStyle(
-                  color: Color(0xFFFDC24C),
-                  fontSize: 14,
+                style: TextStyle(
+                  color: const Color(0xFFFDC24C),
+                  fontSize: 14.sp, // Responsive font size
                 ),
               ),
             ),
@@ -279,10 +289,10 @@ class CompassSelectionView extends StatelessWidget {
   /// Build chat floating action button
   Widget _buildChatButton() {
     return Container(
-      width: 60,
-      height: 60,
+      width: 60.w, // Responsive width
+      height: 60.h, // Responsive height
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r), // Responsive border radius
         gradient: const LinearGradient(
           colors: [Color(0xFFFDC24C), Color(0xFFE0A800)],
           begin: Alignment.topLeft,
@@ -290,16 +300,16 @@ class CompassSelectionView extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFFDC24C).withValues(alpha: 0.4),
-            blurRadius: 12,
-            spreadRadius: 3,
-            offset: const Offset(0, 6),
+            color: const Color(0xFFFDC24C).withValues(alpha: 0.4),
+            blurRadius: 12.r, // Responsive blur
+            spreadRadius: 3.r, // Responsive spread
+            offset: Offset(0, 6.h), // Responsive offset
           ),
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
+            blurRadius: 8.r, // Responsive blur
+            spreadRadius: 1.r, // Responsive spread
+            offset: Offset(0, 2.h), // Responsive offset
           ),
         ],
       ),
@@ -307,10 +317,10 @@ class CompassSelectionView extends StatelessWidget {
         onPressed: () => _openChat(),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: const Icon(
+        child: Icon(
           Icons.smart_toy,
-          color: Color(0xFF2C3E50),
-          size: 28,
+          color: const Color(0xFF2C3E50),
+          size: 28.sp, // Responsive icon size
         ),
       ),
     );

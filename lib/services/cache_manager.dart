@@ -187,14 +187,12 @@ class CacheManager {
   Future<int> clearExpiredCache() async {
     try {
       final keys = _prefs.getKeys();
-      final timestampKeys =
-          keys
-              .where(
-                (key) =>
-                    key.startsWith(_cachePrefix) &&
-                    key.endsWith(_timestampSuffix),
-              )
-              .toList();
+      final timestampKeys = keys
+          .where(
+            (key) =>
+                key.startsWith(_cachePrefix) && key.endsWith(_timestampSuffix),
+          )
+          .toList();
 
       int clearedCount = 0;
       final now = DateTime.now();
@@ -228,23 +226,19 @@ class CacheManager {
   Map<String, dynamic> getCacheStats() {
     try {
       final keys = _prefs.getKeys();
-      final cacheKeys =
-          keys
-              .where(
-                (key) =>
-                    key.startsWith(_cachePrefix) &&
-                    !key.endsWith(_timestampSuffix),
-              )
-              .toList();
+      final cacheKeys = keys
+          .where(
+            (key) =>
+                key.startsWith(_cachePrefix) && !key.endsWith(_timestampSuffix),
+          )
+          .toList();
 
-      final timestampKeys =
-          keys
-              .where(
-                (key) =>
-                    key.startsWith(_cachePrefix) &&
-                    key.endsWith(_timestampSuffix),
-              )
-              .toList();
+      final timestampKeys = keys
+          .where(
+            (key) =>
+                key.startsWith(_cachePrefix) && key.endsWith(_timestampSuffix),
+          )
+          .toList();
 
       int totalSize = 0;
       int expiredCount = 0;

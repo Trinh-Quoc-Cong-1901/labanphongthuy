@@ -22,7 +22,8 @@ class _StartupViewState extends State<StartupView> {
       await Future.delayed(const Duration(milliseconds: 800));
 
       // Check onboarding status
-      final isOnboardingCompleted = await OnboardingService.isOnboardingCompleted();
+      final isOnboardingCompleted =
+          await OnboardingService.isOnboardingCompleted();
 
       if (mounted) {
         if (isOnboardingCompleted) {

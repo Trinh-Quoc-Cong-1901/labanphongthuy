@@ -36,7 +36,8 @@ class ChatMessage extends Equatable {
       id: json['id'] ?? '',
       content: json['content'] ?? '',
       role: json['role'] == 'user' ? MessageRole.user : MessageRole.assistant,
-      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      timestamp:
+          DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
       status: MessageStatus.values.firstWhere(
         (status) => status.name == json['status'],
         orElse: () => MessageStatus.sent,

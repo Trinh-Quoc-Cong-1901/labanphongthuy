@@ -2,19 +2,19 @@ import 'package:equatable/equatable.dart';
 import 'direction_info.dart';
 
 enum FengShuiDirectionType {
-  sinhKhi,      // Sinh khí - Thượng cát
-  dienNien,     // Diên niên (Phúc Đức) - Thượng cát  
-  thienY,       // Thiên Y - Trung cát
-  phucVi,       // Phục vị - Tiểu cát
-  hoaHai,       // Họa hại - Tiểu hung
-  lucSat,       // Lục sát - Trung hung
-  nguQuy,       // Ngũ quỷ - Thượng hung
-  tuyetMenh,    // Tuyệt mệnh - Thượng hung
+  sinhKhi, // Sinh khí - Thượng cát
+  dienNien, // Diên niên (Phúc Đức) - Thượng cát
+  thienY, // Thiên Y - Trung cát
+  phucVi, // Phục vị - Tiểu cát
+  hoaHai, // Họa hại - Tiểu hung
+  lucSat, // Lục sát - Trung hung
+  nguQuy, // Ngũ quỷ - Thượng hung
+  tuyetMenh, // Tuyệt mệnh - Thượng hung
 }
 
 enum PersonalDestinyGroup {
-  dongTu,   // Đông Tứ (1,3,4,9)
-  tayTu,    // Tây Tứ (2,6,7,8)
+  dongTu, // Đông Tứ (1,3,4,9)
+  tayTu, // Tây Tứ (2,6,7,8)
 }
 
 class PersonalInfo extends Equatable {
@@ -35,15 +35,15 @@ class PersonalInfo extends Equatable {
     final lastTwoDigits = birthYear % 100;
     final tensDigit = lastTwoDigits ~/ 10;
     final onesDigit = lastTwoDigits % 10;
-    
+
     // Sum last 2 digits
     int sum = tensDigit + onesDigit;
-    
+
     // Reduce to single digit if needed
     while (sum > 9) {
       sum = (sum ~/ 10) + (sum % 10);
     }
-    
+
     int kuaNumber;
     if (birthYear < 2000) {
       // Formula for birth year BEFORE 2000
@@ -68,8 +68,8 @@ class PersonalInfo extends Equatable {
       }
     }
 
-    final destinyGroup = [1, 3, 4, 9].contains(kuaNumber) 
-        ? PersonalDestinyGroup.dongTu 
+    final destinyGroup = [1, 3, 4, 9].contains(kuaNumber)
+        ? PersonalDestinyGroup.dongTu
         : PersonalDestinyGroup.tayTu;
 
     return PersonalInfo(
@@ -102,7 +102,8 @@ class FengShuiDirectionResult extends Equatable {
   });
 
   @override
-  List<Object?> get props => [direction, type, name, description, isGood, priority];
+  List<Object?> get props =>
+      [direction, type, name, description, isGood, priority];
 }
 
 class FengShuiResult extends Equatable {
@@ -114,11 +115,13 @@ class FengShuiResult extends Equatable {
     required this.directions,
   });
 
-  List<FengShuiDirectionResult> get goodDirections => 
-      directions.where((d) => d.isGood).toList()..sort((a, b) => a.priority.compareTo(b.priority));
-      
-  List<FengShuiDirectionResult> get badDirections => 
-      directions.where((d) => !d.isGood).toList()..sort((a, b) => a.priority.compareTo(b.priority));
+  List<FengShuiDirectionResult> get goodDirections =>
+      directions.where((d) => d.isGood).toList()
+        ..sort((a, b) => a.priority.compareTo(b.priority));
+
+  List<FengShuiDirectionResult> get badDirections =>
+      directions.where((d) => !d.isGood).toList()
+        ..sort((a, b) => a.priority.compareTo(b.priority));
 
   FengShuiDirectionResult? getDirectionType(BaGuaDirection direction) =>
       directions.firstWhere((d) => d.direction == direction);
