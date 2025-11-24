@@ -156,55 +156,68 @@ class CompassSelectionView extends StatelessWidget {
                 BorderRadius.circular(CompassUITheme.cardBorderRadius),
           ),
           padding: EdgeInsets.symmetric(
-            vertical: 24.h, // Responsive vertical padding
+            vertical: 20.h, // Reduced responsive vertical padding for tablets
+            horizontal:
+                12.w, // Add horizontal padding to prevent content overflow
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Real compass image
-              Container(
-                width: 120.w, // Responsive image size
-                height: 120.h, // Responsive image size
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8.r,
-                      spreadRadius: 2.r,
-                      offset: Offset(0, 2.h),
+              // Real compass image with better tablet support
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  // Calculate appropriate image size based on available width
+                  // Use smaller of width-based or fixed size to prevent overflow
+                  final maxWidth =
+                      constraints.maxWidth * 0.6; // 60% of available width
+                  final imageSize =
+                      maxWidth.clamp(80.0, 140.0); // Min 80, Max 140
+
+                  return Container(
+                    width: imageSize,
+                    height: imageSize,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8.r,
+                          spreadRadius: 2.r,
+                          offset: Offset(0, 2.h),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: Image.asset(
-                    imagePath,
-                    width: 120.w,
-                    height: 120.h,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 120.w,
-                        height: 120.h,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.5),
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.explore,
-                          size: 60.sp,
-                          color: CompassUITheme.cardLabelColor
-                              .withValues(alpha: 0.7),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Image.asset(
+                        imagePath,
+                        width: imageSize,
+                        height: imageSize,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: imageSize,
+                            height: imageSize,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: Colors.grey.withValues(alpha: 0.5),
+                                width: 1.w,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.explore,
+                              size: (imageSize * 0.4).clamp(24.0, 60.0),
+                              color: CompassUITheme.cardLabelColor
+                                  .withValues(alpha: 0.7),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
 
               SizedBox(height: 16.h), // Responsive spacing
