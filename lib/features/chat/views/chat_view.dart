@@ -651,9 +651,13 @@ class ChatView extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          Text(
-            'Phong Vân đang suy nghĩ...',
-            style: assistantTextStyle,
+          Flexible(
+            child: Text(
+              'Phong Vân đang suy nghĩ...',
+              style: assistantTextStyle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       );
@@ -729,6 +733,10 @@ class ChatView extends StatelessWidget {
                 child: TextField(
                   controller: controller.messageController,
                   focusNode: controller.messageFocusNode,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: const Color(0xFF333333),
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Hỏi Phong Vân về phong thủy...',
                     hintStyle: TextStyle(
