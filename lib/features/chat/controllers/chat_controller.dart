@@ -56,6 +56,53 @@ class ChatController extends GetxController {
     });
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+
+    // Immediate fallback - show default questions right away
+    if (suggestedQuestions.isEmpty) {
+      LoggerUtils.debug('ChatController: onReady - Setting immediate fallback questions');
+      final immediateFallbackQuestions = [
+        SuggestedQuestion(
+          id: 'fallback1',
+          question: 'Hướng nào tốt nhất cho cửa chính của ngôi nhà?',
+          category: 'laBan',
+        ),
+        SuggestedQuestion(
+          id: 'fallback2',
+          question: 'Cách bố trí phòng khách theo phong thủy?',
+          category: 'nhaO',
+        ),
+        SuggestedQuestion(
+          id: 'fallback3',
+          question: 'Hướng ngồi làm việc nào mang lại may mắn?',
+          category: 'vanPhong',
+        ),
+        SuggestedQuestion(
+          id: 'fallback4',
+          question: 'Màu sắc may mắn cho người sinh năm 1990?',
+          category: 'mauSac',
+        ),
+      ];
+      suggestedQuestions.assignAll(immediateFallbackQuestions);
+    }
+
+    // Force reload suggested questions after the view is ready
+    Future.delayed(const Duration(milliseconds: 500), () {
+      LoggerUtils.debug('ChatController: onReady - Force reloading suggested questions');
+      _loadSuggestedQuestions();
+
+      // If still empty after a delay, try to reinitialize the ChatService
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (suggestedQuestions.length <= 4) {  // Only fallback questions
+          LoggerUtils.debug('ChatController: Still only fallback questions, forcing ChatService reinit...');
+          forceReinitializeSuggestedQuestions();
+        }
+      });
+    });
+  }
+
   Future<void> _initializeWithChatService() async {
     try {
       // Try to get the ChatService to check if it's available
@@ -109,24 +156,68 @@ class ChatController extends GetxController {
 
   // Load suggested questions
   void _loadSuggestedQuestions() {
-    final allQuestions = _chatService.getSuggestedQuestions();
+    LoggerUtils.debug('ChatController: Loading suggested questions...');
+    try {
+      final allQuestions = _chatService.getSuggestedQuestions();
+      LoggerUtils.debug('ChatController: Got ${allQuestions.length} questions from service');
 
-    // If there are no messages, show initial suggested questions
-    if (messages.isEmpty) {
-      // Show a varied selection from each category
-      final categorized = _chatService.getSuggestedQuestionsByCategory();
-      final selectedQuestions = <SuggestedQuestion>[];
-
-      for (final category in categorized.keys) {
-        if (categorized[category]!.isNotEmpty) {
-          // Take up to 2 questions from each category
-          selectedQuestions.addAll(categorized[category]!
-              .take(category == QuestionCategory.tongQuat.name ? 2 : 1));
-        }
+      if (allQuestions.isEmpty) {
+        LoggerUtils.debug('ChatController: No suggested questions available, using fallback questions');
+        // Use fallback questions instead of clearing
+        final fallbackQuestions = [
+          SuggestedQuestion(
+            id: 'fallback1',
+            question: 'Hướng nào tốt nhất cho cửa chính của ngôi nhà?',
+            category: 'laBan',
+          ),
+          SuggestedQuestion(
+            id: 'fallback2',
+            question: 'Cách bố trí phòng khách theo phong thủy?',
+            category: 'nhaO',
+          ),
+          SuggestedQuestion(
+            id: 'fallback3',
+            question: 'Hướng ngồi làm việc nào mang lại may mắn?',
+            category: 'vanPhong',
+          ),
+          SuggestedQuestion(
+            id: 'fallback4',
+            question: 'Màu sắc may mắn cho người sinh năm 1990?',
+            category: 'mauSac',
+          ),
+        ];
+        suggestedQuestions.assignAll(fallbackQuestions);
+        return;
       }
 
-      suggestedQuestions.assignAll(selectedQuestions.take(6).toList());
-    } else {
+      // Only hide questions when we actually have user messages with real content
+      final userMessages = messages.where((message) =>
+          message.role == MessageRole.user &&
+          message.content.isNotEmpty &&
+          !message.isLoading
+      ).toList();
+
+      LoggerUtils.debug('ChatController: User messages count: ${userMessages.length}, Total messages: ${messages.length}');
+
+      if (userMessages.isEmpty) {
+        // Show a varied selection from each category
+        final categorized = _chatService.getSuggestedQuestionsByCategory();
+        final selectedQuestions = <SuggestedQuestion>[];
+
+        for (final category in categorized.keys) {
+          if (categorized[category]!.isNotEmpty) {
+            // Take up to 2 questions from each category
+            selectedQuestions.addAll(categorized[category]!
+                .take(category == QuestionCategory.tongQuat.name ? 2 : 1));
+          }
+        }
+
+        final finalQuestions = selectedQuestions.take(6).toList();
+        LoggerUtils.debug('ChatController: No user messages, showing ${finalQuestions.length} default questions');
+        suggestedQuestions.assignAll(finalQuestions);
+        return;
+      }
+
       // Based on the last few messages, suggest related questions
       final lastMessageContent =
           messages.lastOrNull?.content.toLowerCase() ?? '';
@@ -167,6 +258,13 @@ class ChatController extends GetxController {
         // Take up to 4 filtered questions
         suggestedQuestions.assignAll(filteredQuestions.take(4).toList());
       }
+
+      // If we have user messages, we'll hide the questions via the UI logic
+      // This method is mainly called when starting new conversations
+      LoggerUtils.debug('ChatController: User messages exist, questions will be hidden by UI');
+    } catch (e) {
+      LoggerUtils.error('ChatController: Error loading suggested questions', e);
+      // Don't clear on error, keep existing questions
     }
   }
 
@@ -181,6 +279,50 @@ class ChatController extends GetxController {
       );
       messages.add(welcomeMessage);
       hasInitialMessage.value = true;
+    }
+  }
+
+  // Force reinitialize suggested questions when they're not loading properly
+  Future<void> forceReinitializeSuggestedQuestions() async {
+    try {
+      LoggerUtils.debug('ChatController: Force reinitializing suggested questions...');
+
+      // Use the new force reset method from ChatService
+      await _chatService.forceResetSuggestedQuestions();
+
+      // Retry loading
+      _loadSuggestedQuestions();
+
+      // If still empty, add some default questions directly
+      if (suggestedQuestions.isEmpty) {
+        LoggerUtils.debug('ChatController: Creating fallback suggested questions...');
+        final fallbackQuestions = [
+          SuggestedQuestion(
+            id: '1',
+            question: 'Hướng nào tốt nhất cho cửa chính của ngôi nhà?',
+            category: 'laBan',
+          ),
+          SuggestedQuestion(
+            id: '2',
+            question: 'Cách bố trí phòng khách theo phong thủy?',
+            category: 'nhaO',
+          ),
+          SuggestedQuestion(
+            id: '3',
+            question: 'Hướng ngồi làm việc nào mang lại may mắn?',
+            category: 'vanPhong',
+          ),
+          SuggestedQuestion(
+            id: '4',
+            question: 'Màu sắc may mắn cho người sinh năm 1990?',
+            category: 'mauSac',
+          ),
+        ];
+        suggestedQuestions.assignAll(fallbackQuestions);
+        LoggerUtils.debug('ChatController: Assigned ${fallbackQuestions.length} fallback questions');
+      }
+    } catch (e) {
+      LoggerUtils.error('ChatController: Error in force reinitialize suggested questions', e);
     }
   }
 

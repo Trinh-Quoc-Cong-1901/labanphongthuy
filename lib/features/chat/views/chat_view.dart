@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_controller.dart';
 import '../models/chat_message.dart';
 import '../models/conversation.dart';
-import '../constants/chat_ui_theme.dart';
 import '../../compass/constants/compass_ui_theme.dart';
 
 class ChatView extends StatelessWidget {
@@ -12,22 +12,41 @@ class ChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ChatController>(
-      init: ChatController(),
-      builder: (controller) => Scaffold(
-        backgroundColor: CompassUITheme.backgroundColor,
-        appBar: _buildAppBar(controller),
-        drawer: _buildDrawer(context),
-        body: _buildBody(controller),
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), // iPhone 11 Pro design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return OrientationBuilder(
+          builder: (context, orientation) {
+            return GetBuilder<ChatController>(
+              init: ChatController(),
+              builder: (controller) {
+                final isLandscape = orientation == Orientation.landscape;
+
+                return Scaffold(
+                  backgroundColor: CompassUITheme.backgroundColor,
+                  appBar: _buildAppBar(controller, isLandscape),
+                  drawer: isLandscape ? null : _buildDrawer(context), // Hide drawer in landscape
+                  body: isLandscape
+                      ? _buildLandscapeBody(controller)
+                      : _buildBody(controller),
+                  endDrawer: isLandscape ? _buildDrawer(context) : null, // Show as end drawer in landscape
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
-  PreferredSizeWidget _buildAppBar(ChatController controller) {
+  PreferredSizeWidget _buildAppBar(ChatController controller, [bool isLandscape = false]) {
     return AppBar(
       backgroundColor: CompassUITheme.backgroundColor,
       elevation: 0,
       iconTheme: const IconThemeData(color: Colors.white),
+      toolbarHeight: isLandscape ? 56.h : 56.h, // Adjustable height based on orientation
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Get.back(),
@@ -36,26 +55,26 @@ class ChatView extends StatelessWidget {
       title: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 40.w,
+            height: 40.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  blurRadius: 4.r,
+                  offset: Offset(0, 2.h),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.smart_toy,
-              color: Color(0xFFFDC24C),
-              size: 24,
+              color: const Color(0xFFFDC24C),
+              size: 24.sp,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +82,7 @@ class ChatView extends StatelessWidget {
                 Text(
                   'Phong Vân',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -71,7 +90,7 @@ class ChatView extends StatelessWidget {
                 Text(
                   'Chuyên gia phong thủy',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     color: Colors.white70,
                   ),
                 ),
@@ -116,12 +135,12 @@ class ChatView extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Text(
                   'Lịch sử trò chuyện',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                    fontSize: 20.sp,
                     color: Colors.white,
                   ),
                 ),
@@ -130,10 +149,10 @@ class ChatView extends StatelessWidget {
           ),
           Divider(
             color: Colors.grey[300],
-            thickness: 1,
+            thickness: 1.h,
             height: 0,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Expanded(
             child: GetBuilder<ChatController>(
               builder: (controller) => Obx(() {
@@ -147,14 +166,14 @@ class ChatView extends StatelessWidget {
                             Icon(
                               Icons.chat_bubble_outline,
                               color: Colors.grey[400],
-                              size: 48,
+                              size: 48.sp,
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             Text(
                               'Không có lịch sử trò chuyện',
                               style: TextStyle(
                                 color: Colors.grey[600],
-                                fontSize: 16,
+                                fontSize: 16.sp,
                               ),
                             ),
                           ],
@@ -164,7 +183,30 @@ class ChatView extends StatelessWidget {
               }),
             ),
           ),
-          SafeArea(child: Container()),
+          SafeArea(
+            child: GetBuilder<ChatController>(
+              builder: (controller) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Obx(() => Text(
+                      'Tổng số: ${controller.conversationHistory.length} cuộc trò chuyện',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12.sp,
+                      ),
+                    )),
+                    IconButton(
+                      icon: Icon(Icons.close, size: 20.sp),
+                      onPressed: () => Navigator.of(context).pop(),
+                      color: Colors.grey[600],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -197,7 +239,7 @@ class ChatView extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w500,
               color: Colors.grey[800],
             ),
@@ -206,7 +248,7 @@ class ChatView extends StatelessWidget {
             _formatDate(conversation.updatedAt),
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: 12,
+              fontSize: 12.sp,
             ),
           ),
           onTap: () {
@@ -267,34 +309,129 @@ class ChatView extends StatelessWidget {
   }
 
   Widget _buildBody(ChatController controller) {
-    return Column(
-      children: [
-        Expanded(
-          child: Obx(() => ListView.builder(
-                controller: controller.scrollController,
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.messages.length,
-                itemBuilder: (context, index) =>
-                    _buildMessageBubble(controller.messages[index]),
-              )),
-        ),
-        _buildSuggestedQuestions(controller),
-        _buildMessageInput(controller),
-      ],
+    return SafeArea(
+      top: false, // AppBar handles top safe area
+      child: Column(
+        children: [
+          Expanded(
+            child: Obx(() => ListView.builder(
+                  controller: controller.scrollController,
+                  padding: EdgeInsets.fromLTRB(
+                    16.w,
+                    16.h,
+                    16.w,
+                    0, // No bottom padding since message input handles it
+                  ),
+                  itemCount: controller.messages.length,
+                  itemBuilder: (context, index) =>
+                      _buildMessageBubble(controller.messages[index]),
+                )),
+          ),
+          _buildSuggestedQuestions(controller),
+          _buildMessageInput(controller),
+        ],
+      ),
+    );
+  }
+
+  // Optimized landscape layout
+  Widget _buildLandscapeBody(ChatController controller) {
+    return SafeArea(
+      child: Row(
+        children: [
+          // Chat messages area - takes up most of the space
+          Expanded(
+            flex: 3,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Obx(() => ListView.builder(
+                        controller: controller.scrollController,
+                        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                        itemCount: controller.messages.length,
+                        itemBuilder: (context, index) =>
+                            _buildMessageBubble(controller.messages[index]),
+                      )),
+                ),
+                _buildMessageInput(controller),
+              ],
+            ),
+          ),
+          // Suggested questions sidebar in landscape
+          Container(
+            width: 1.sw > 1024 ? 350.w : 300.w, // Adaptive width based on screen size
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              border: Border(left: BorderSide(color: Colors.grey[300]!, width: 1.w)),
+            ),
+            child: SafeArea(
+              left: false, // Don't apply left safe area since it's not at the edge
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1.h)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Câu hỏi gợi ý',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                        Builder(
+                          builder: (context) => IconButton(
+                            icon: Icon(Icons.close, size: 20.sp),
+                            onPressed: () => Scaffold.of(context).closeEndDrawer(),
+                            color: Colors.grey[600],
+                            tooltip: 'Đóng',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildLandscapeSuggestedQuestions(controller),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   // Build suggested questions
   Widget _buildSuggestedQuestions(ChatController controller) {
     return Obx(() {
-      if (controller.suggestedQuestions.isEmpty ||
-          controller.messages.length > 1) {
+      // Hide if no questions available
+      if (controller.suggestedQuestions.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      // Only hide when we actually have user messages with real content
+      final userMessages = controller.messages.where((message) =>
+          message.role == MessageRole.user &&
+          message.content.isNotEmpty &&
+          !message.isLoading
+      ).toList();
+
+      if (userMessages.isNotEmpty) {
         return const SizedBox.shrink();
       }
 
       return Container(
-        height: 120,
-        padding: const EdgeInsets.all(16),
+        height: 120.h,
+        padding: EdgeInsets.all(16.w),
         color: Colors.grey[50],
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -302,27 +439,27 @@ class ChatView extends StatelessWidget {
           itemBuilder: (context, index) {
             final question = controller.suggestedQuestions[index];
             return Container(
-              margin: const EdgeInsets.only(right: 12),
-              width: 250,
+              margin: EdgeInsets.only(right: 12.w),
+              width: 250.w,
               child: Card(
                 elevation: 2,
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   side: BorderSide(
-                      color: const Color(0xFFFDC24C).withOpacity(0.3)),
+                      color: const Color(0xFFFDC24C).withValues(alpha: 0.3)),
                 ),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   onTap: () =>
                       controller.useSuggestedQuestion(question.question),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.w),
                     child: Text(
                       question.question,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF333333),
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        color: const Color(0xFF333333),
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -337,9 +474,94 @@ class ChatView extends StatelessWidget {
     });
   }
 
+  // Landscape suggested questions layout
+  Widget _buildLandscapeSuggestedQuestions(ChatController controller) {
+    return Obx(() {
+      // Hide if no questions available
+      if (controller.suggestedQuestions.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Text(
+              'Không có câu hỏi gợi ý',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      // Only hide when we actually have user messages with real content
+      final userMessages = controller.messages.where((message) =>
+          message.role == MessageRole.user &&
+          message.content.isNotEmpty &&
+          !message.isLoading
+      ).toList();
+
+      if (userMessages.isNotEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Text(
+              'Cuộc trò chuyện đã bắt đầu',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        padding: EdgeInsets.all(16.w),
+        itemCount: controller.suggestedQuestions.length,
+        itemBuilder: (context, index) {
+          final question = controller.suggestedQuestions[index];
+          return Container(
+            margin: EdgeInsets.only(bottom: 12.h),
+            child: Card(
+              elevation: 1,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+                side: BorderSide(
+                    color: const Color(0xFFFDC24C).withValues(alpha: 0.3)),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8.r),
+                onTap: () => controller.useSuggestedQuestion(question.question),
+                child: Padding(
+                  padding: EdgeInsets.all(12.w),
+                  child: Text(
+                    question.question,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: const Color(0xFF333333),
+                      height: 1.3,
+                    ),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    });
+  }
+
   Widget _buildMessageBubble(ChatMessage message) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
+      constraints: BoxConstraints(
+        maxWidth: 1.sw * 0.85, // Max width is 85% of screen width
+      ),
       child: Row(
         mainAxisAlignment: message.isFromUser
             ? MainAxisAlignment.end
@@ -348,24 +570,27 @@ class ChatView extends StatelessWidget {
         children: [
           if (!message.isFromUser) ...[
             _buildAvatarAI(),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              constraints: BoxConstraints(
+                maxWidth: 1.sw * (1.sw > 768 ? 0.6 : 0.75), // Responsive max width
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color: message.isFromUser ? Color(0xFFFDC24C) : Colors.white,
+                color: message.isFromUser ? const Color(0xFFFDC24C) : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(message.isFromUser ? 16 : 4),
-                  bottomRight: Radius.circular(message.isFromUser ? 4 : 16),
+                  topLeft: Radius.circular(16.r),
+                  topRight: Radius.circular(16.r),
+                  bottomLeft: Radius.circular(message.isFromUser ? 16.r : 4.r),
+                  bottomRight: Radius.circular(message.isFromUser ? 4.r : 16.r),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4.r,
+                    offset: Offset(0, 1.h),
                   ),
                 ],
               ),
@@ -373,13 +598,13 @@ class ChatView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildMessageContent(message),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     _formatTime(message.timestamp),
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.sp,
                       color: message.isFromUser
-                          ? Color(0xFF2C3E50).withValues(alpha: 0.7)
+                          ? const Color(0xFF2C3E50).withValues(alpha: 0.7)
                           : Colors.grey[600],
                     ),
                   ),
@@ -388,7 +613,7 @@ class ChatView extends StatelessWidget {
             ),
           ),
           if (message.isFromUser) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
             _buildAvatarUser(),
           ],
         ],
@@ -397,31 +622,35 @@ class ChatView extends StatelessWidget {
   }
 
   Widget _buildMessageContent(ChatMessage message) {
-    final assistantTextStyle = const TextStyle(
-      fontSize: 16,
-      color: Color(0xFF333333),
+    final assistantTextStyle = TextStyle(
+      fontSize: 16.sp,
+      color: const Color(0xFF333333),
       height: 1.4,
     );
 
     if (message.isFromUser) {
       return Text(
         message.content,
-        style: ChatUITheme.userMessageTextStyle,
+        style: TextStyle(
+          fontSize: 16.sp,
+          color: const Color(0xFF2C3E50),
+          fontWeight: FontWeight.w500,
+        ),
       );
     }
 
     if (message.isLoading) {
       return Row(
         children: [
-          const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
+          SizedBox(
+            width: 18.w,
+            height: 18.h,
+            child: const CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFDC24C)),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Text(
             'Phong Vân đang suy nghĩ...',
             style: assistantTextStyle,
@@ -435,9 +664,9 @@ class ChatView extends StatelessWidget {
       styleSheet: MarkdownStyleSheet(
         p: assistantTextStyle,
         listBullet: assistantTextStyle,
-        listIndent: 18,
-        listBulletPadding: const EdgeInsets.only(right: 6),
-        blockSpacing: 4,
+        listIndent: 18.w,
+        listBulletPadding: EdgeInsets.only(right: 6.w),
+        blockSpacing: 4.h,
       ),
       softLineBreak: true,
     );
@@ -445,120 +674,122 @@ class ChatView extends StatelessWidget {
 
   Widget _buildAvatarAI() {
     return Container(
-      width: 32,
-      height: 32,
+      width: 32.w,
+      height: 32.h,
       decoration: BoxDecoration(
-        color: Color(0xFFFDC24C),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFFDC24C),
+        borderRadius: BorderRadius.circular(16.r),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.smart_toy,
-        color: Color(0xFF2C3E50),
-        size: 18,
+        color: const Color(0xFF2C3E50),
+        size: 18.sp,
       ),
     );
   }
 
   Widget _buildAvatarUser() {
     return Container(
-      width: 32,
-      height: 32,
+      width: 32.w,
+      height: 32.h,
       decoration: BoxDecoration(
-        color: Color(0xFF2C3E50),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF2C3E50),
+        borderRadius: BorderRadius.circular(16.r),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.person,
         color: Colors.white,
-        size: 18,
+        size: 18.sp,
       ),
     );
   }
 
   Widget _buildMessageInput(ChatController controller) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
+            blurRadius: 4.r,
+            offset: Offset(0, -2.h),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: TextField(
-                controller: controller.messageController,
-                focusNode: controller.messageFocusNode,
-                decoration: InputDecoration(
-                  hintText: 'Hỏi Phong Vân về phong thủy...',
-                  hintStyle: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(24.r),
                 ),
-                maxLines: null,
-                textCapitalization: TextCapitalization.sentences,
-                autofocus: !controller.hasInitialMessage.value,
-                onSubmitted: (value) {
-                  if (value.trim().isNotEmpty) {
-                    controller.sendMessage();
-                  }
-                },
+                child: TextField(
+                  controller: controller.messageController,
+                  focusNode: controller.messageFocusNode,
+                  decoration: InputDecoration(
+                    hintText: 'Hỏi Phong Vân về phong thủy...',
+                    hintStyle: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.grey,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 12.h,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                  maxLines: null,
+                  textCapitalization: TextCapitalization.sentences,
+                  autofocus: !controller.hasInitialMessage.value,
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      controller.sendMessage();
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Obx(() => GestureDetector(
-                onTap: controller.messageText.value.trim().isEmpty ||
-                        controller.isLoading.value
-                    ? null
-                    : controller.sendMessage,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: controller.messageText.value.trim().isEmpty
-                        ? Colors.grey[400]
-                        : Color(0xFFFDC24C),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: controller.isLoading.value
-                      ? const Center(
-                          child: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF2C3E50)),
+            SizedBox(width: 8.w),
+            Obx(() => GestureDetector(
+                  onTap: controller.messageText.value.trim().isEmpty ||
+                          controller.isLoading.value
+                      ? null
+                      : controller.sendMessage,
+                  child: Container(
+                    width: 48.w,
+                    height: 48.h,
+                    decoration: BoxDecoration(
+                      color: controller.messageText.value.trim().isEmpty
+                          ? Colors.grey[400]
+                          : const Color(0xFFFDC24C),
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    child: controller.isLoading.value
+                        ? Center(
+                            child: SizedBox(
+                              width: 18.w,
+                              height: 18.h,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF2C3E50)),
+                              ),
                             ),
+                          )
+                        : Icon(
+                            Icons.send,
+                            color: controller.messageText.value.trim().isEmpty
+                                ? Colors.white
+                                : const Color(0xFF2C3E50),
+                            size: 20.sp,
                           ),
-                        )
-                      : Icon(
-                          Icons.send,
-                          color: controller.messageText.value.trim().isEmpty
-                              ? Colors.white
-                              : Color(0xFF2C3E50),
-                          size: 20,
-                        ),
-                ),
-              )),
-        ],
+                  ),
+                )),
+          ],
+        ),
       ),
     );
   }
