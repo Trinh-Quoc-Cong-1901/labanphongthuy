@@ -129,91 +129,99 @@ class ChatView extends StatelessWidget {
   // Build conversation history drawer
   Widget _buildDrawer(BuildContext context) {
     final appBarHeight = AppBar().preferredSize.height;
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 768;
 
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: Column(
-        children: [
-          Container(
-            height: appBarHeight + MediaQuery.of(context).padding.top,
-            color: CompassUITheme.backgroundColor,
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Text(
-                  'Lịch sử trò chuyện',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.sp,
-                    color: Colors.white,
+    return SizedBox(
+      width: isTablet ? 250.w : null,
+      child: Drawer(
+        backgroundColor: Colors.white,
+        child: Column(
+          children: [
+            Container(
+              height: appBarHeight + MediaQuery.of(context).padding.top,
+              color: CompassUITheme.backgroundColor,
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Text(
+                    'Lịch sử trò chuyện',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 1.h,
-            height: 0,
-          ),
-          SizedBox(height: 8.h),
-          Expanded(
-            child: GetBuilder<ChatController>(
-              builder: (controller) => Obx(() {
-                final conversations = controller.conversationHistory;
+            Divider(
+              color: Colors.grey[300],
+              thickness: 1.h,
+              height: 0,
+            ),
+            SizedBox(height: 8.h),
+            Expanded(
+              child: GetBuilder<ChatController>(
+                builder: (controller) => Obx(() {
+                  final conversations = controller.conversationHistory;
 
-                return conversations.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.chat_bubble_outline,
-                              color: Colors.grey[400],
-                              size: 48.sp,
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              'Không có lịch sử trò chuyện',
+                  return conversations.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline,
+                                color: Colors.grey[400],
+                                size: 48.sp,
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                'Không có lịch sử trò chuyện',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : _buildConversationList(conversations, context);
+                }),
+              ),
+            ),
+            SafeArea(
+              child: GetBuilder<ChatController>(
+                builder: (controller) => Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Obx(() => Text(
+                              'Tổng số: ${controller.conversationHistory.length} cuộc trò chuyện',
                               style: TextStyle(
                                 color: Colors.grey[600],
-                                fontSize: 16.sp,
+                                fontSize: 12.sp,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : _buildConversationList(conversations, context);
-              }),
-            ),
-          ),
-          SafeArea(
-            child: GetBuilder<ChatController>(
-              builder: (controller) => Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Obx(() => Text(
-                          'Tổng số: ${controller.conversationHistory.length} cuộc trò chuyện',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12.sp,
-                          ),
-                        )),
-                    IconButton(
-                      icon: Icon(Icons.close, size: 20.sp),
-                      onPressed: () => Navigator.of(context).pop(),
-                      color: Colors.grey[600],
-                    ),
-                  ],
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, size: 20.sp),
+                        onPressed: () => Navigator.of(context).pop(),
+                        color: Colors.grey[600],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -425,7 +433,8 @@ class ChatView extends StatelessWidget {
   }
 
   // Build suggested questions
-  Widget _buildSuggestedQuestions(BuildContext context, ChatController controller) {
+  Widget _buildSuggestedQuestions(
+      BuildContext context, ChatController controller) {
     return Obx(() {
       // Hide if no questions available
       if (controller.suggestedQuestions.isEmpty) {
@@ -445,7 +454,7 @@ class ChatView extends StatelessWidget {
       }
 
       final isTablet = MediaQuery.of(context).size.shortestSide >= 768;
-      
+
       return Container(
         height: isTablet ? 140.h : 120.h,
         padding: EdgeInsets.all(16.w),
